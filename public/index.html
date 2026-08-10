@@ -1,1155 +1,1134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Music Trade Economy | VizCon 2026</title>
-  <meta name="description" content="How music connects the world: a scrollytelling visualization exploring cultural trade across 70 countries.">
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #fff6df;
-      --bg-card: #ffffff;
-      --bg-dark: #1a1a2e;
-      --text: #262626;
-      --text-muted: #6d6d6d;
-      --text-light: #a8a8a8;
-
-      --serenade: #F2C3FF;
-      --heartache: #5CAFFF;
-      --pursuit: #02D098;
-      --confidence: #FF5C00;
-      --complicated: #96753C;
-      --riddance: #A290E9;
-      --self-love: #FFD700;
-
-      --accent: #02D098;
-      --accent-warm: #FF5C00;
-      --accent-soft: #F2C3FF;
-      --accent-blue: #5CAFFF;
-      --accent-purple: #A290E9;
-      --accent-gold: #FFD700;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'DM Sans', -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
-
-    /* ===== SCROLLYTELLING ===== */
-    .scroll-section {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3rem 1.5rem;
-    }
-
-    .scroll-content {
-      max-width: 640px;
-      width: 100%;
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-
-    .scroll-content.is-active {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ===== HERO (fits iPhone 15: 393x852) ===== */
-    .hero {
-      min-height: 100svh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 2rem 1.5rem;
-      position: relative;
-      background: linear-gradient(180deg, #fff6df 0%, #fff0c8 100%);
-    }
-
-    .hero-emoji {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      animation: pulse 3s ease infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    .hero h1 {
-      font-family: 'Lora', serif;
-      font-size: clamp(1.6rem, 6vw, 2.4rem);
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 1rem;
-      line-height: 1.3;
-    }
-
-    .hero-sub {
-      font-size: clamp(0.95rem, 3vw, 1.1rem);
-      color: var(--text-muted);
-      max-width: 440px;
-      margin-bottom: 1.5rem;
-    }
-
-    .hero-intro {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      max-width: 500px;
-      line-height: 1.8;
-    }
-
-    .hero-intro strong { color: var(--text); }
-
-    .scroll-hint {
-      position: absolute;
-      bottom: 1.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      color: var(--text-light);
-      font-size: 0.8rem;
-      animation: bounce 2s ease infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(-6px); }
-    }
-
-    /* ===== TYPOGRAPHY ===== */
-    h2 {
-      font-family: 'Lora', serif;
-      font-size: clamp(1.4rem, 5vw, 2rem);
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 1.2rem;
-    }
-
-    h3 {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.75rem;
-    }
-
-    p {
-      font-size: 1rem;
-      color: var(--text-muted);
-      margin-bottom: 1rem;
-    }
-
-    p strong { color: var(--text); }
-
-    .joy-voice {
-      background: linear-gradient(135deg, rgba(2, 208, 152, 0.08), rgba(255, 215, 0, 0.08));
-      border-radius: 12px;
-      padding: 1rem 1.2rem;
-      margin: 1.2rem 0;
-      font-style: italic;
-      color: var(--text-muted);
-      border-left: 3px solid var(--accent);
-    }
-
-    .big-number {
-      font-family: 'Lora', serif;
-      font-size: clamp(2.5rem, 10vw, 4rem);
-      font-weight: 700;
-      color: var(--confidence);
-      text-align: center;
-      margin: 1.5rem 0 0.5rem;
-    }
-
-    .big-number span {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.35em;
-      color: var(--text-muted);
-      display: block;
-      font-weight: 400;
-    }
-
-    blockquote {
-      border-left: 3px solid var(--accent);
-      padding: 1rem 1.2rem;
-      margin: 1.5rem 0;
-      background: rgba(2, 208, 152, 0.05);
-      border-radius: 0 10px 10px 0;
-      font-family: 'Lora', serif;
-      font-size: 1.05rem;
-      color: var(--text);
-    }
-
-    /* ===== STAT BAR ===== */
-    .stat-bar {
-      display: flex;
-      height: 44px;
-      border-radius: 22px;
-      overflow: hidden;
-      margin: 1.5rem 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .stat-bar-imported {
-      background: var(--confidence);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 600; font-size: 0.85rem; color: #fff;
-      transition: width 1.5s ease;
-    }
-
-    .stat-bar-local {
-      background: var(--accent);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 600; font-size: 0.85rem; color: #fff;
-      transition: width 1.5s ease;
-    }
-
-    /* ===== REVEAL ===== */
-    .reveal-container { text-align: center; padding: 2rem 0; }
-
-    .reveal-suspense {
-      font-family: 'Lora', serif;
-      font-size: 1.2rem;
-      font-style: italic;
-      color: var(--text-muted);
-      margin-bottom: 0.6rem;
-      opacity: 0;
-      transform: translateY(15px);
-      transition: all 0.6s ease;
-    }
-
-    .reveal-suspense.show { opacity: 1; transform: translateY(0); }
-
-    .reveal-answer {
-      font-family: 'Lora', serif;
-      font-size: clamp(1.6rem, 6vw, 2.6rem);
-      font-weight: 700;
-      color: var(--text);
-      opacity: 0;
-      transform: scale(0.9);
-      transition: all 0.8s ease;
-    }
-
-    .reveal-answer.show { opacity: 1; transform: scale(1); }
-
-    .reveal-stat {
-      font-size: 0.95rem;
-      color: var(--accent);
-      margin-top: 0.5rem;
-      opacity: 0;
-      transition: opacity 0.6s ease 0.3s;
-    }
-
-    .reveal-stat.show { opacity: 1; }
-
-    /* ===== SPOTIFY EMBED ===== */
-    .spotify-embed {
-      margin: 1.5rem 0;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .spotify-embed iframe {
-      border-radius: 12px;
-    }
-
-    /* ===== TABLE ===== */
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1.5rem 0;
-      font-size: 0.85rem;
-    }
-
-    .data-table th {
-      text-align: left;
-      padding: 0.6rem 0.75rem;
-      border-bottom: 2px solid #e8e8e8;
-      color: var(--text-muted);
-      font-weight: 500;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .data-table td {
-      padding: 0.6rem 0.75rem;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .data-table tr:hover td { background: rgba(2, 208, 152, 0.03); }
-    .data-table .highlight td { color: var(--confidence); font-weight: 500; }
-
-    .origin-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-
-    .origin-badge.anglo { background: rgba(92, 175, 255, 0.15); color: #2d7fc4; }
-    .origin-badge.latin { background: rgba(255, 92, 0, 0.12); color: var(--confidence); }
-
-    /* ===== COMPARE CARDS ===== */
-    .compare-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin: 1.5rem 0;
-    }
-
-    @media (max-width: 500px) { .compare-grid { grid-template-columns: 1fr; } }
-
-    .compare-card {
-      background: var(--bg-card);
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-      border: 1px solid #f0f0f0;
-    }
-
-    .compare-card h4 { font-size: 0.95rem; margin-bottom: 0.4rem; }
-
-    .compare-card .metric {
-      font-family: 'Lora', serif;
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin: 0.3rem 0;
-    }
-
-    .compare-card .metric-label { font-size: 0.75rem; color: var(--text-muted); }
-
-    /* ===== GROUP CARDS ===== */
-    .group-card {
-      background: var(--bg-card);
-      border-radius: 16px;
-      padding: 1.5rem;
-      margin: 1.5rem 0;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-      border: 1px solid #f0f0f0;
-      transition: transform 0.2s;
-    }
-
-    .group-card:hover { transform: translateY(-2px); }
-
-    .group-card .countries {
-      display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.75rem 0;
-    }
-
-    .country-chip {
-      display: inline-block;
-      padding: 3px 10px;
-      background: var(--bg);
-      border-radius: 20px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .group-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 0.75rem;
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid #f0f0f0;
-    }
-
-    .group-stat-item { text-align: center; }
-
-    .group-stat-item .value {
-      font-family: 'Lora', serif;
-      font-size: 1.3rem;
-      font-weight: 700;
-    }
-
-    .group-stat-item .label { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem; }
-
-    /* ===== BAR CHARTS ===== */
-    .bar-chart-row {
-      display: flex; align-items: center; margin-bottom: 0.5rem; height: 30px;
-    }
-
-    .bar-label {
-      width: 100px; flex-shrink: 0;
-      font-size: 0.75rem; color: var(--text-muted);
-      text-align: right; padding-right: 0.75rem;
-    }
-
-    .bar-track {
-      flex: 1; height: 22px;
-      background: #f5f0e0; border-radius: 11px;
-      overflow: hidden;
-    }
-
-    .bar-fill {
-      height: 100%; border-radius: 11px;
-      transition: width 1s ease;
-      display: flex; align-items: center;
-      padding-left: 8px; font-size: 0.65rem;
-      font-weight: 600; color: #fff;
-    }
-
-    /* ===== COUNTRY SELECTOR ===== */
-    .country-selector { text-align: center; padding: 1.5rem 0; }
-
-    .country-search {
-      width: 100%; max-width: 360px;
-      padding: 0.9rem 1.3rem;
-      font-size: 1rem;
-      background: var(--bg-card);
-      border: 2px solid #e8e8e8;
-      border-radius: 50px;
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.3s;
-      font-family: inherit;
-    }
-
-    .country-search:focus { border-color: var(--accent); }
-    .country-search::placeholder { color: var(--text-light); }
-
-    .country-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 0.4rem;
-      margin-top: 1rem;
-      max-height: 260px;
-      overflow-y: auto;
-      padding: 0.5rem;
-    }
-
-    .country-btn {
-      padding: 0.5rem 0.6rem;
-      background: var(--bg-card);
-      border: 1px solid #e8e8e8;
-      border-radius: 10px;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-
-    .country-btn:hover {
-      background: rgba(2, 208, 152, 0.08);
-      border-color: var(--accent);
-      color: var(--text);
-    }
-
-    .country-btn.selected {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-      font-weight: 600;
-    }
-
-    /* ===== COUNTRY PROFILE ===== */
-    .country-profile { display: none; animation: slideUp 0.5s ease; }
-    .country-profile.visible { display: block; }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .profile-header { text-align: center; margin-bottom: 1.5rem; }
-    .profile-header .flag { font-size: 2.5rem; margin-bottom: 0.3rem; }
-    .profile-header h3 { font-family: 'Lora', serif; font-size: 1.5rem; }
-    .profile-header .archetype { color: var(--accent); font-size: 0.85rem; margin-top: 0.2rem; }
-
-    .profile-metrics {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.75rem;
-      margin: 1rem 0;
-    }
-
-    .profile-metric {
-      background: var(--bg-card);
-      border-radius: 12px;
-      padding: 1rem;
-      text-align: center;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.04);
-    }
-
-    .profile-metric .value { font-family: 'Lora', serif; font-size: 1.3rem; font-weight: 700; }
-    .profile-metric .label { font-size: 0.65rem; color: var(--text-muted); margin-top: 0.2rem; }
-
-    .profile-narrative {
-      background: var(--bg-card);
-      border-radius: 12px;
-      padding: 1.2rem;
-      border-left: 3px solid var(--accent-gold);
-      margin: 1.5rem 0;
-      font-style: italic;
-      color: var(--text-muted);
-      line-height: 1.7;
-    }
-
-    /* ===== METHODOLOGY ===== */
-    .methodology {
-      background: var(--bg-card);
-      border-radius: 16px;
-      padding: 2rem;
-      margin: 1.5rem 0;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    }
-
-    .methodology h3 {
-      margin-top: 1.2rem;
-      margin-bottom: 0.5rem;
-      color: var(--confidence);
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .methodology h3:first-child { margin-top: 0; }
-    .methodology p, .methodology li { font-size: 0.85rem; color: var(--text-muted); }
-
-    .methodology ul { list-style: none; padding-left: 1rem; }
-
-    .methodology li {
-      margin-bottom: 0.4rem; position: relative; padding-left: 0.8rem;
-    }
-
-    .methodology li::before {
-      content: ''; position: absolute; left: 0; top: 0.55rem;
-      width: 4px; height: 4px; border-radius: 50%;
-      background: var(--accent);
-    }
-
-    .methodology a { color: var(--confidence); text-decoration: none; }
-    .methodology a:hover { text-decoration: underline; }
-
-    /* ===== FOOTER ===== */
-    footer {
-      text-align: center;
-      padding: 3rem 1.5rem;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      border-top: 1px solid #e8e8e8;
-    }
-
-    footer a { color: var(--confidence); text-decoration: none; }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 500px) {
-      .scroll-section { padding: 2.5rem 1.25rem; }
-      .profile-metrics { grid-template-columns: repeat(2, 1fr); }
-      .data-table { font-size: 0.75rem; }
-      .data-table th, .data-table td { padding: 0.4rem 0.5rem; }
-      .group-stats { grid-template-columns: repeat(2, 1fr); }
-      .bar-label { width: 80px; font-size: 0.7rem; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Music Connects the World | VizContest 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root {
+  --sans: 'DM Sans', sans-serif;
+  --serif: 'Lora', serif;
+  --bg: #fff6df;
+  --text: #262626;
+  --text-muted: #6d6d6d;
+  --gray-300: #cacaca;
+  --serenade: #F2C3FF;
+  --heartache: #5CAFFF;
+  --confidence: #FF5C00;
+  --complicated: #96753C;
+  --riddance: #A290E9;
+  --self-love: #FFD700;
+  --pursuit: #02D098;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--sans);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Sections ─── */
+.slide {
+  scroll-snap-align: start;
+  height: 100svh;
+  overflow-y: auto;
+  position: relative;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 0;
+}
+
+.slide--hero,
+.slide--closing,
+.slide--methodology {
+  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.slide__text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px;
+  min-height: 0;
+}
+
+.slide__viz {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 32px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ─── Section backgrounds ─── */
+#hero { background: #fff6df; }
+#the-song { background: rgba(92,175,255,0.08); }
+#the-artist { background: rgba(255,92,0,0.08); }
+#the-paradox { background: rgba(162,144,233,0.08); }
+#the-groups { background: rgba(2,208,152,0.08); }
+#latin-secret { background: rgba(255,215,0,0.08); }
+#your-country { background: #fff6df; }
+#closing { background: rgba(242,195,255,0.08); }
+#methodology { background: #ffffff; }
+
+/* ─── Typography ─── */
+h1 {
+  font-family: var(--serif);
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 24px;
+}
+
+h2 {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3.5vw, 2.8rem);
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+h3 {
+  font-family: var(--sans);
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+p {
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  max-width: 540px;
+}
+
+.stat-big {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+
+.accent-heartache { color: var(--heartache); }
+.accent-confidence { color: var(--confidence); }
+.accent-riddance { color: var(--riddance); }
+.accent-pursuit { color: var(--pursuit); }
+.accent-self-love { color: var(--self-love); }
+.accent-serenade { color: var(--serenade); }
+
+/* ─── Navigation dots ─── */
+.nav-dots {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
+}
+
+.nav-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--text);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+  padding: 0;
+}
+
+.nav-dot.active {
+  background: var(--text);
+  transform: scale(1.3);
+}
+
+.nav-dot:hover {
+  background: var(--gray-300);
+}
+
+/* ─── Animations ─── */
+.fade-in {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-in-delay-1 { transition-delay: 0.15s; }
+.fade-in-delay-2 { transition-delay: 0.3s; }
+.fade-in-delay-3 { transition-delay: 0.45s; }
+.fade-in-delay-4 { transition-delay: 0.6s; }
+
+/* ─── Spotify embed ─── */
+.embed-wrapper {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 12px;
+}
+
+.embed-wrapper iframe {
+  border-radius: 12px;
+}
+
+/* ─── Lists ─── */
+.champion-list {
+  list-style: none;
+  width: 100%;
+  max-width: 420px;
+  margin-top: 16px;
+}
+
+.champion-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--gray-300);
+  font-size: 0.9rem;
+}
+
+.champion-list li:last-child {
+  border-bottom: none;
+}
+
+.champion-list .year {
+  font-weight: 600;
+  min-width: 44px;
+}
+
+.champion-list .name {
+  flex: 1;
+  margin: 0 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.champion-list .stat {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* ─── Country profile ─── */
+.country-selector {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px 16px;
+  font-family: var(--sans);
+  font-size: 1rem;
+  border: 2px solid var(--gray-300);
+  border-radius: 8px;
+  background: white;
+  color: var(--text);
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.country-profile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+  max-width: 360px;
+  margin-top: 12px;
+}
+
+.profile-stat {
+  text-align: center;
+  padding: 12px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 12px;
+  border: 1px solid var(--gray-300);
+}
+
+.profile-stat .value {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.profile-stat .label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+
+/* ─── D3 Chart ─── */
+.chart-container {
+  width: 100%;
+  max-width: 500px;
+  height: 260px;
+  margin-top: 20px;
+}
+
+.chart-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--confidence);
+  stroke-width: 2.5;
+}
+
+.chart-area {
+  fill: rgba(255,92,0,0.1);
+}
+
+.chart-dot {
+  fill: var(--confidence);
+}
+
+.axis text {
+  font-family: var(--sans);
+  font-size: 11px;
+  fill: var(--text-muted);
+}
+
+.axis line, .axis path {
+  stroke: var(--gray-300);
+}
+
+.chart-tooltip {
+  font-family: var(--sans);
+  font-size: 12px;
+  fill: var(--text);
+}
+
+/* ─── Stat comparison cards ─── */
+.comparison-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.comp-card {
+  padding: 24px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.8);
+  border: 1px solid var(--gray-300);
+}
+
+.comp-card h4 {
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.comp-card .comp-value {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.comp-card .comp-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ─── Group badges ─── */
+.group-section {
+  margin-bottom: 24px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.group-section h4 {
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid var(--gray-300);
+}
+
+/* ─── Closing ─── */
+.closing-content {
+  max-width: 640px;
+  padding: 48px 24px;
+}
+
+/* ─── Methodology ─── */
+.methodology-content {
+  max-width: 640px;
+  padding: 48px 24px;
+  text-align: left;
+}
+
+.methodology-content h2 {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.methodology-content p {
+  max-width: 100%;
+}
+
+/* ─── Stat counter animation ─── */
+@keyframes countUp {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.hero-stat-animated {
+  animation: countUp 0.8s ease-out forwards;
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 767px) {
+  .slide {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: 100svh;
+  }
+
+  .slide__text {
+    padding: 24px 20px 16px;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+
+  .slide__viz {
+    padding: 12px 20px 24px;
+    overflow-y: auto;
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 8vw, 2.6rem);
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-size: clamp(1.3rem, 5vw, 1.8rem);
+  }
+
+  .stat-big {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+  }
+
+  .nav-dots {
+    right: 8px;
+    gap: 8px;
+  }
+
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .embed-wrapper {
+    max-width: 100%;
+  }
+
+  .champion-list {
+    max-width: 100%;
+  }
+
+  .champion-list li {
+    font-size: 0.8rem;
+    padding: 6px 8px;
+  }
+
+  .comparison-cards {
+    max-width: 100%;
+  }
+
+  .chart-container {
+    max-width: 100%;
+    height: 200px;
+  }
+
+  .country-profile {
+    max-width: 100%;
+  }
+
+  .slide--hero,
+  .slide--closing {
+    padding: 24px 20px;
+  }
+
+  .closing-content,
+  .methodology-content {
+    padding: 24px 20px;
+  }
+}
+</style>
 </head>
 <body>
 
-<!-- ===== HERO (iPhone 15: 393x852 - fits in one screen) ===== -->
-<section class="hero" id="hero">
-  <div class="hero-emoji">🌍🎶</div>
-  <h1>You think your music taste is unique.</h1>
-  <p class="hero-sub">That playlist you made at 2 a.m.? The artist you found "before they were big"? Let's see where it actually came from.</p>
-  <p class="hero-intro">We analyzed <strong>42.8 million</strong> chart entries across <strong>70 countries</strong> over nine years. And we found something wonderful: music connects us in ways we never notice. The same songs cross every border. The same rhythms unite strangers on opposite sides of the planet.</p>
-  <p class="hero-intro" style="margin-top: 0.75rem; color: var(--accent); font-weight: 500;">This is the Music Trade Economy. Scroll to explore how the world shares its sound.</p>
-  <div class="scroll-hint">↓</div>
-</section>
+<!-- Navigation Dots -->
+<nav class="nav-dots" aria-label="Section navigation">
+  <button class="nav-dot active" data-section="0" aria-label="Hero"></button>
+  <button class="nav-dot" data-section="1" aria-label="Two Superpowers"></button>
+  <button class="nav-dot" data-section="2" aria-label="Three Personalities"></button>
+  <button class="nav-dot" data-section="3" aria-label="Latin Secret"></button>
+  <button class="nav-dot" data-section="4" aria-label="The Song"></button>
+  <button class="nav-dot" data-section="5" aria-label="The Artist"></button>
+  <button class="nav-dot" data-section="6" aria-label="Your Country"></button>
+  <button class="nav-dot" data-section="7" aria-label="Closing"></button>
+  <button class="nav-dot" data-section="8" aria-label="Methodology"></button>
+</nav>
 
-<!-- ===== SECTION 1: IMPORTS ===== -->
-<section class="scroll-section" id="sec-imports">
-  <div class="scroll-content" id="content-imports">
-    <h2>The World Listens Together</h2>
-    <p>Think of your country's top charts as a shared playlist. Some songs are homegrown. But most? They traveled from somewhere else to reach your ears.</p>
-    <p><strong>67% of what the world listens to crosses at least one border to get there.</strong> Only a third is local.</p>
-
-    <div class="stat-bar" id="import-bar">
-      <div class="stat-bar-imported" style="width: 0%">67% traveled here</div>
-      <div class="stat-bar-local" style="width: 0%">33% local</div>
-    </div>
-
-    <div class="joy-voice">That means two out of every three songs connecting with someone right now were made in a different country. We are already sharing more than we realize. That's kind of beautiful.</div>
+<!-- Section 1: Hero -->
+<section id="hero" class="slide slide--hero">
+  <div class="fade-in">
+    <h3 class="accent-heartache" style="margin-bottom:8px;">The Music Trade Economy</h3>
+    <h1>We tracked every song<br>that crossed a border.</h1>
+    <div class="stat-big accent-confidence hero-stat" data-target="67">0%</div>
+    <p class="stat-label" style="margin-bottom:24px;">of chart-weeks belong to foreign artists</p>
+    <p style="max-width:520px; margin:0 auto;">
+      3 million chart-weeks. 100 countries. 9 years on Spotify.<br>
+      Which nations export hits? Which ones welcome them? Let us show you how music connects the world.
+    </p>
   </div>
 </section>
 
-<!-- ===== SECTION 2: THE SONG ===== -->
-<section class="scroll-section" id="sec-song-reveal">
-  <div class="scroll-content" id="content-song-reveal">
-    <div class="reveal-container">
-      <div class="reveal-suspense" id="suspense-1">If there is one song that crossed every border...</div>
-      <div class="reveal-suspense" id="suspense-2">one song that charted in 67 countries...</div>
-      <div class="reveal-suspense" id="suspense-3">one song that connected strangers across the entire planet...</div>
-      <div class="reveal-answer" id="song-reveal">Blinding Lights<br><span style="font-size: 0.45em; color: var(--text-muted); font-family: 'DM Sans', sans-serif;">The Weeknd</span></div>
-      <div class="reveal-stat" id="song-stat">7,051 weeks on foreign charts. 67 countries. From Reykjavik to Jakarta.</div>
+<!-- Section 2: Two Superpowers -->
+<section id="the-paradox" class="slide">
+  <div class="slide__text">
+    <div class="fade-in">
+      <h3 class="accent-riddance">Two Superpowers</h3>
+      <h2>English goes widest. Latin stays longest.</h2>
+      <p>
+        English-language music reaches 55+ countries on average. But Latin hits
+        stay on charts for weeks and weeks once they arrive. Two different strategies,
+        both connecting millions.
+      </p>
+      <p>
+        Breadth vs. depth. Neither wins. Together they cover the whole world.
+      </p>
     </div>
-
-    <div class="spotify-embed">
-      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/0VjIjW4GlUZAMYd2vXMi3b?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-    </div>
-
-    <p style="margin-top: 1rem;">While you were listening to it thinking "this is MY song" -- 67 countries felt the exact same thing. At the same time. That's what connection sounds like.</p>
   </div>
-</section>
-
-<section class="scroll-section" id="sec-song-table">
-  <div class="scroll-content" id="content-song-table">
-    <h2>The Song That Traveled Farthest, Every Year</h2>
-    <table class="data-table" id="yearly-songs-table">
-      <thead><tr><th>Year</th><th>Song</th><th>Artist</th><th>From</th><th>Reach</th></tr></thead>
-      <tbody></tbody>
-    </table>
-    <p><strong>Nine years in a row, the most-traveled song came from an English-speaking country.</strong> The Anglophone world has built a highway for music -- and it reaches everywhere.</p>
-    <div class="joy-voice">But here's where it gets interesting. The top SONGS are always English. The top ARTISTS? That's a completely different story.</div>
-  </div>
-</section>
-
-<!-- ===== SECTION 3: THE ARTIST ===== -->
-<section class="scroll-section" id="sec-artist-reveal">
-  <div class="scroll-content" id="content-artist-reveal">
-    <div class="reveal-container">
-      <div class="reveal-suspense" id="artist-suspense-1">If there is one artist who owned the decade...</div>
-      <div class="reveal-suspense" id="artist-suspense-2">not by reaching the most countries at once...</div>
-      <div class="reveal-suspense" id="artist-suspense-3">but by never, ever leaving the charts...</div>
-      <div class="reveal-answer" id="artist-reveal">Bad Bunny</div>
-      <div class="reveal-stat" id="artist-stat">126,075 weeks on foreign charts. In Spanish. No compromise.</div>
-    </div>
-
-    <div class="spotify-embed">
-      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/2b8fOow8UzyDFAE27YhOZM?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-    </div>
-
-    <p style="margin-top: 1rem;">The #1 exported artist in 2020. And 2021. And 2022. And 2023. And 2025. Five out of nine years. Entirely in Spanish. Proof that connection does not require a shared language.</p>
-  </div>
-</section>
-
-<section class="scroll-section" id="sec-artist-table">
-  <div class="scroll-content" id="content-artist-table">
-    <h2>The Most Exported Artist, Every Year</h2>
-    <table class="data-table" id="yearly-artists-table">
-      <thead><tr><th>Year</th><th>Artist</th><th>From</th><th>Weeks</th></tr></thead>
-      <tbody></tbody>
-    </table>
-    <p><strong>Latin artists dominated 8 of 9 years.</strong></p>
-    <p>So the top songs are always English, but the top artists are always Latin. How is that possible?</p>
-    <div class="joy-voice">Because there are two completely different strategies for connecting with the world. Both work brilliantly. And understanding the difference is where this gets really fun.</div>
-  </div>
-</section>
-
-<!-- ===== SECTION 4: TWO STRATEGIES ===== -->
-<section class="scroll-section" id="sec-strategies">
-  <div class="scroll-content" id="content-strategies">
-    <h2>Two Ways to Connect the World</h2>
-    <p>Imagine two ways to throw a party.</p>
-    <p><strong>Party A</strong> (US, UK, Canada, Australia): A new hit every week. Everyone dances for a month, then moves to the next song. The DJ never stops dropping fresh tracks.</p>
-    <p><strong>Party B</strong> (Puerto Rico, Colombia): Fewer songs, but they become anthems. People play them all summer. They become the soundtrack of an entire season.</p>
-
-    <div class="compare-grid">
-      <div class="compare-card">
-        <h4>🇺🇸 United States</h4>
-        <div class="metric" style="color: var(--accent-blue);">7,571</div>
-        <div class="metric-label">songs shared with the world</div>
-        <div style="margin-top: 0.75rem;">
-          <div class="metric" style="color: var(--accent-blue); font-size: 1.3rem;">11 weeks</div>
-          <div class="metric-label">average time on foreign charts</div>
-        </div>
+  <div class="slide__viz">
+    <div class="fade-in comparison-cards">
+      <div class="comp-card">
+        <h4>Anglophone Music</h4>
+        <div class="comp-value accent-heartache">55+ countries</div>
+        <div class="comp-desc">Widest reach on average. English is the lingua franca of pop.</div>
       </div>
-      <div class="compare-card">
-        <h4>🇨🇴 Colombia</h4>
-        <div class="metric" style="color: var(--confidence);">846</div>
-        <div class="metric-label">songs shared with the world</div>
-        <div style="margin-top: 0.75rem;">
-          <div class="metric" style="color: var(--confidence); font-size: 1.3rem;">30 weeks</div>
-          <div class="metric-label">average time on foreign charts (3x longer!)</div>
-        </div>
+      <div class="comp-card" style="margin-top:4px;">
+        <h4>Latin Music</h4>
+        <div class="comp-value accent-confidence">30+ weeks</div>
+        <div class="comp-desc">Longest median chart stay. Once it arrives, it never leaves.</div>
+      </div>
+      <div class="comp-card" style="margin-top:4px;">
+        <h4>K-Pop</h4>
+        <div class="comp-value accent-riddance">Fastest climb</div>
+        <div class="comp-desc">Enters charts at highest positions. Fan armies mobilize globally.</div>
       </div>
     </div>
-
-    <blockquote>English-speaking countries connect through volume: many songs, everywhere, briefly. Latin countries connect through depth: fewer songs, but they stay. Both strategies unite people across borders. Neither is "better" -- they're different kinds of connection.</blockquote>
   </div>
 </section>
 
-<!-- ===== SECTION 5: GROUPS ===== -->
-<section class="scroll-section" id="sec-groups-intro">
-  <div class="scroll-content" id="content-groups-intro">
-    <h2>How Countries Play Different Roles</h2>
-    <p>Not every country participates the same way in this global music exchange. Some broadcast. Some receive. Some build walls. Some build bridges to their neighbors.</p>
-    <p>Here are the patterns we found:</p>
+<!-- Section 3: Three Music Personalities -->
+<section id="the-groups" class="slide">
+  <div class="slide__text">
+    <div class="fade-in">
+      <h3 class="accent-pursuit">Three Music Personalities</h3>
+      <h2>Every country plays one of three roles in the global music economy.</h2>
+      <p>
+        <strong>Exporters</strong> send hits outward: the US, UK, South Korea, Puerto Rico.
+      </p>
+      <p>
+        <strong>Open markets</strong> welcome the world: UAE, Singapore, Luxembourg have 90%+ foreign charts.
+      </p>
+      <p>
+        <strong>Local champions</strong> keep their own music on top: Japan, India, Turkey, Brazil.
+      </p>
+    </div>
   </div>
-</section>
-
-<section class="scroll-section" id="sec-anglophone">
-  <div class="scroll-content" id="content-anglophone">
-    <div class="group-card">
-      <h3><span style="color: var(--accent-blue);">●</span> The Global Broadcasters</h3>
-      <p>The US, UK, Canada, Australia, New Zealand, and Ireland form an open network. They share music freely among themselves and broadcast it relentlessly to the world.</p>
-      <div class="countries" id="anglo-countries"></div>
-      <div class="group-stats">
-        <div class="group-stat-item">
-          <div class="value" style="color: var(--accent-blue);">1.15M</div>
-          <div class="label">export weeks combined</div>
-        </div>
-        <div class="group-stat-item">
-          <div class="value" style="color: var(--accent-blue);">68:1</div>
-          <div class="label">US sends vs receives</div>
-        </div>
-        <div class="group-stat-item">
-          <div class="value" style="color: var(--accent-blue);">54%</div>
-          <div class="label">from this year's releases</div>
-        </div>
+  <div class="slide__viz">
+    <div class="fade-in" id="groups-viz">
+      <div class="group-section">
+        <h4 style="color:var(--confidence);">Exporters</h4>
+        <div class="badge-row" id="exporters-badges"></div>
       </div>
-      <div class="joy-voice">Their superpower is freshness. Over half their exports are songs released that same year. The new-music pipeline never stops. Your Discover Weekly? Mostly these countries talking to you.</div>
-    </div>
-  </div>
-</section>
-
-<section class="scroll-section" id="sec-fortresses">
-  <div class="scroll-content" id="content-fortresses">
-    <div class="group-card">
-      <h3><span style="color: var(--confidence);">●</span> The Self-Sufficient Scenes</h3>
-      <p>Some countries have such a rich local music scene that imported songs barely crack their charts. Their own artists fill the room.</p>
-      <div id="fortress-chart"></div>
-      <div class="joy-voice">These aren't isolated -- they simply produce enough incredible music to fill their own playlists first. Brazil's funk carioca, Korea's K-pop, France's rap scene. They don't need the import aisle because the local produce is that good.</div>
-    </div>
-  </div>
-</section>
-
-<section class="scroll-section" id="sec-corridors">
-  <div class="scroll-content" id="content-corridors">
-    <div class="group-card">
-      <h3><span style="color: var(--accent-purple);">●</span> The Regional Bridges</h3>
-      <p>Some countries don't broadcast globally. Instead, they build musical bridges to their neighbors.</p>
-      <p><strong>Puerto Rico → Latin America.</strong> Music flows to Mexico, Argentina, Chile, Colombia. The bridge is built on shared language and rhythm.</p>
-      <p><strong>South Korea → Southeast Asia.</strong> 23% of Thailand's imports. 28% of Vietnam's. K-pop travels a very specific route.</p>
-      <p><strong>Turkey → Central Asia & Middle East.</strong> Cultural familiarity creates its own highway.</p>
-      <div class="joy-voice">This is maybe the most beautiful finding: music doesn't just spread randomly. It follows cultural bonds. Shared history, shared language, shared feeling. The algorithm doesn't decide what connects us -- proximity and culture do.</div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== SECTION 6: LATIN SECRET ===== -->
-<section class="scroll-section" id="sec-latin">
-  <div class="scroll-content" id="content-latin">
-    <h2>Why Latin Music Connects Differently</h2>
-    <p>Latin artists dominate the "top artist" ranking while English songs dominate the "top song" ranking. Here's why that's not a contradiction -- it's a completely different approach to connection.</p>
-
-    <div class="group-card" style="margin-top: 1rem;">
-      <h3>1. They build together</h3>
-      <p>In the US, 40% of exported songs feature multiple artists. In Puerto Rico and Colombia? <strong>72%.</strong> Features, duets, "ft." -- every collaboration introduces one artist's audience to another.</p>
-      <div id="collab-chart"></div>
-    </div>
-
-    <div class="group-card">
-      <h3>2. Their songs become anthems</h3>
-      <p>A US hit stays on foreign charts for about <strong>11 weeks</strong>. A Colombian hit? <strong>30 weeks.</strong> These songs don't fade -- they become summer soundtracks, party staples, shared memories.</p>
-
-      <div class="spotify-embed">
-        <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/4LRPiXqCikLlN15c3yImP7?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <div class="group-section">
+        <h4 style="color:var(--heartache);">Open Markets</h4>
+        <div class="badge-row" id="open-badges"></div>
+      </div>
+      <div class="group-section">
+        <h4 style="color:var(--pursuit);">Local Champions</h4>
+        <div class="badge-row" id="local-badges"></div>
       </div>
     </div>
-
-    <div class="group-card">
-      <h3>3. One name carries a nation</h3>
-      <p>The US exports through <strong>2,845</strong> artists. Puerto Rico through <strong>456</strong> -- and Bad Bunny alone is 42% of it. That's not a weakness. It means one artist becomes a cultural ambassador so powerful that an entire country's identity travels on their name.</p>
-    </div>
   </div>
 </section>
 
-<!-- ===== SECTION 7: YOUR COUNTRY ===== -->
-<section class="scroll-section" id="sec-your-country" style="min-height: auto; padding-top: 4rem;">
-  <div class="scroll-content" id="content-your-country" style="max-width: 720px;">
-    <h2 style="text-align: center;">Now Let's Talk About You</h2>
-    <p style="text-align: center;">Where are you from? Or where did you grow up listening to music? Pick your country and see how it fits into this global exchange.</p>
-
-    <div class="country-selector">
-      <input type="text" class="country-search" id="country-search" placeholder="Search for your country...">
-      <div class="country-grid" id="country-grid"></div>
+<!-- Section 4: Why Latin Music Stays -->
+<section id="latin-secret" class="slide">
+  <div class="slide__text">
+    <div class="fade-in">
+      <h3 class="accent-self-love">Why Latin Music Stays</h3>
+      <h2>72% collaboration rate. 30-week chart longevity.</h2>
+      <p>
+        Latin artists collaborate at nearly double the rate of other genres.
+        When Bad Bunny features Rosalia, or Shakira teams up with Bizarrap,
+        they combine fan bases into something that resonates everywhere.
+      </p>
+      <p>
+        The result: songs that stay on charts 50% longer than the global median.
+        Connection is built into the creation process.
+      </p>
     </div>
-
-    <div class="country-profile" id="country-profile">
-      <div class="profile-header">
-        <div class="flag" id="profile-flag"></div>
-        <h3 id="profile-name"></h3>
-        <div class="archetype" id="profile-archetype"></div>
+  </div>
+  <div class="slide__viz">
+    <div class="fade-in embed-wrapper">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/6habFhsOp2NvshLv26DqMb?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <div class="fade-in fade-in-delay-1 embed-wrapper">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/0fea68AdmYNygeTGI4RC18?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <div class="fade-in fade-in-delay-2 embed-wrapper">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/7qEHsqek33rTcFNT9PFqLf?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <div class="fade-in fade-in-delay-3 comparison-cards" style="margin-top:16px;">
+      <div class="comp-card" style="display:flex; gap:24px; align-items:center;">
+        <div>
+          <div class="comp-value accent-self-love">72%</div>
+          <div class="comp-desc">Collab rate</div>
+        </div>
+        <div>
+          <div class="comp-value accent-confidence">30w</div>
+          <div class="comp-desc">Median longevity</div>
+        </div>
+        <div>
+          <div class="comp-value accent-pursuit">8/9</div>
+          <div class="comp-desc">Years on top</div>
+        </div>
       </div>
-      <div class="profile-metrics" id="profile-metrics"></div>
-      <div id="profile-chart"></div>
-      <div class="profile-narrative" id="profile-narrative"></div>
     </div>
   </div>
 </section>
 
-<!-- ===== CLOSING ===== -->
-<section class="scroll-section" id="sec-closing">
-  <div class="scroll-content" id="content-closing" style="text-align: center;">
-    <div style="font-size: 2.5rem; margin-bottom: 1rem;">🌍🎶</div>
-    <h2>So Is Your Music Taste Unique?</h2>
-    <p>In some ways, yes. Nobody else has your exact combination of songs, memories, and 2 a.m. playlists.</p>
-    <p>But the raw materials? They were shared with millions of people across dozens of countries. The same melodies that moved you moved someone in Seoul, someone in Bogota, someone in Lagos.</p>
-    <p style="color: var(--text); font-weight: 500;">That's not a flaw. That's the most human thing about music: it connects us without asking permission. Across languages, borders, and time zones.</p>
-    <p style="color: var(--accent); margin-top: 1.5rem; font-style: italic; font-family: 'Lora', serif;">Your playlist is yours. But it was built from pieces that belong to the whole world.</p>
+<!-- Section 5: The Most-Traveled Song -->
+<section id="the-song" class="slide">
+  <div class="slide__text">
+    <div class="fade-in">
+      <h3 class="accent-heartache">The Most-Traveled Song</h3>
+      <h2>One song charted in 67 countries and stayed for 7,051 combined weeks.</h2>
+      <p>
+        Blinding Lights left Canada and became the soundtrack of commutes, parties, and late nights
+        across 67 borders. We are listening to the same thing, just in different time zones.
+      </p>
+      <p>
+        Every year, the most globally traveled song came from a different place:
+        the UK, the US, Canada, Australia. The stage keeps rotating.
+      </p>
+    </div>
+  </div>
+  <div class="slide__viz">
+    <div class="fade-in embed-wrapper">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/0VjIjW4GlUZAMYd2vXMi3b?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <div class="fade-in fade-in-delay-1 embed-wrapper">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/7qiZfU4dY1lWllzX7mPBI3?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <div class="fade-in fade-in-delay-2 embed-wrapper">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/02MWAaffLxlfxAUY7c5dvx?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <ul class="fade-in fade-in-delay-3 champion-list" id="song-champions"></ul>
   </div>
 </section>
 
-<!-- ===== METHODOLOGY ===== -->
-<section class="scroll-section" id="sec-methodology" style="min-height: auto; padding-bottom: 2rem;">
-  <div class="scroll-content" id="content-methodology" style="max-width: 720px;">
-    <div class="methodology">
-      <h2 style="margin-bottom: 1rem;">References & Methodology</h2>
+<!-- Section 6: The Most-Traveled Artist -->
+<section id="the-artist" class="slide">
+  <div class="slide__text">
+    <div class="fade-in">
+      <h3 class="accent-confidence">The Most-Traveled Artist</h3>
+      <h2>Latin artists topped the global export ranking 8 out of 9 years.</h2>
+      <p>
+        Not English-language pop stars. Latin artists. Bad Bunny alone
+        accumulated over 70,000 foreign chart-weeks across 5 winning years.
+      </p>
+      <p>
+        He made the world sing in Spanish whether they understood the lyrics or not.
+        The feeling was universal. The data confirms it.
+      </p>
+    </div>
+  </div>
+  <div class="slide__viz">
+    <div class="fade-in embed-wrapper">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/1IHWl5LamUGT3TwnHxBkN8?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <div class="fade-in fade-in-delay-1 embed-wrapper">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/4MzXwWMhyBbmu6hOcLVD49?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <div class="fade-in fade-in-delay-2 embed-wrapper">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/1rgnBhdG2JDFTbYkYRZAku?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <div class="fade-in fade-in-delay-3 embed-wrapper">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/2Fxmhks0bxGSBdJ92vM42m?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <ul class="fade-in fade-in-delay-4 champion-list" id="artist-champions"></ul>
+  </div>
+</section>
 
-      <h3>Data Source</h3>
-      <p><strong>Spotify Charts Daily (2017-2025)</strong><br>
-      Public dataset: <a href="https://www.kaggle.com/datasets/gonzalopezgil/spotify-charts-daily-updated" target="_blank">gonzalopezgil/spotify-charts-daily-updated</a> (Kaggle)</p>
-      <ul>
-        <li>42.8 million rows across 70 countries</li>
-        <li>Daily top-200 songs per country with stream counts</li>
-        <li>9 years of continuous data (2017-2025)</li>
-      </ul>
+<!-- Section 7: Your Country -->
+<section id="your-country" class="slide">
+  <div class="slide__text">
+    <div class="fade-in">
+      <h3 class="accent-confidence">Find Your Country</h3>
+      <h2>How does your country connect to the global music economy?</h2>
+      <p>Pick a country and see how its music travels, or how much it welcomes from abroad.</p>
+      <select class="country-selector" id="country-select" aria-label="Select a country">
+        <option value="">Choose a country...</option>
+      </select>
+      <div class="country-profile" id="country-profile" style="display:none;">
+        <div class="profile-stat">
+          <div class="value" id="prof-export">--</div>
+          <div class="label">Export weeks</div>
+        </div>
+        <div class="profile-stat">
+          <div class="value" id="prof-local">--</div>
+          <div class="label">% Local</div>
+        </div>
+        <div class="profile-stat">
+          <div class="value" id="prof-longevity">--</div>
+          <div class="label">Longevity (p50)</div>
+        </div>
+        <div class="profile-stat">
+          <div class="value" id="prof-spread">--</div>
+          <div class="label">Spread (p50)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide__viz">
+    <div class="fade-in chart-container" id="country-chart"></div>
+    <p id="chart-empty-msg" style="display:none; text-align:center; color:var(--text-muted); font-style:italic;">
+      Select a country to see its export trend over time.
+    </p>
+  </div>
+</section>
 
-      <h3>How We Measured "Music Trade"</h3>
-      <ul>
-        <li><strong>Weekly charts:</strong> We summed daily streams into weekly totals and kept the top 100 songs per country per week (3.16 million records).</li>
-        <li><strong>Artist nationality:</strong> We mapped 84,985 artists to their home countries using Wikipedia, Wikidata, MusicBrainz, and other public sources. Coverage: 99.9%.</li>
-        <li><strong>Export = charting abroad:</strong> When a song charts in a country that isn't the artist's home, that's an "export" for the artist's country and an "import" for the listening country.</li>
-        <li><strong>Every market counts equally:</strong> A chart-week in Luxembourg = a chart-week in the US. This measures cultural reach, not commercial revenue.</li>
-        <li><strong>17 analytical lenses</strong> per country: volume, diversity, longevity, spread, velocity, collaboration, dependency, chart quality, freshness, concentration, and cultural blocs.</li>
-      </ul>
-
-      <h3>Tools</h3>
-      <ul>
-        <li>Data pipeline: Python 3</li>
-        <li>Visualization: D3.js v7, vanilla JavaScript</li>
-        <li>Hosting: Vercel (static deploy from GitHub)</li>
-        <li>AI assistance: Claude (Anthropic) for artist nationality research, pipeline development, and narrative drafting</li>
-      </ul>
-
-      <h3>Repository</h3>
-      <p><a href="https://github.com/Christianetti/vizcon-2026" target="_blank">github.com/Christianetti/vizcon-2026</a></p>
-
-      <h3>VizCon 2026</h3>
-      <ul>
-        <li><strong>Theme:</strong> "How the world lives, thrives, and connects"</li>
-        <li><strong>GenAI disclosure:</strong> Claude (Anthropic) assisted with artist nationality mapping, data pipeline code, and narrative writing</li>
-        <li><strong>Original work:</strong> Analytical methodology, insight discovery, and visualization design are original</li>
-      </ul>
+<!-- Section 8: Closing -->
+<section id="closing" class="slide slide--closing">
+  <div class="closing-content fade-in">
+    <h2>Your playlist is a passport.</h2>
+    <p style="max-width:520px; margin:0 auto 24px; text-align:center;">
+      Every time you press play on a song from another country, you participate
+      in the most joyful form of cultural exchange. No visa required. No translation needed.
+    </p>
+    <div class="stat-big accent-serenade" style="margin-bottom:12px;">96</div>
+    <p class="stat-label" style="margin-bottom:24px;">countries export music to at least one other</p>
+    <p style="max-width:480px; margin:0 auto; text-align:center;">
+      We are already connected. The data proves it. Right now, someone on the other side
+      of the planet is vibing to the same song you are.
+    </p>
+    <div style="margin-top:32px;">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/4Dvkj6JhhA12EX05fT7y2e?utm_source=generator&theme=0" width="320" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
   </div>
 </section>
 
-<footer>
-  <p>The Music Trade Economy | VizContest 2026</p>
-  <p style="margin-top: 0.3rem;">Data: Spotify Charts Daily (2017-2025) | Built with D3.js</p>
-  <p style="margin-top: 0.3rem;"><a href="https://github.com/Christianetti/vizcon-2026">GitHub Repository</a></p>
-</footer>
+<!-- Section 9: Methodology -->
+<section id="methodology" class="slide slide--methodology">
+  <div class="methodology-content fade-in">
+    <h2>Methodology</h2>
+    <p>
+      <strong>Data source:</strong> Spotify Charts (weekly Top 200) for 100 countries,
+      covering January 2016 through June 2025. Approximately 3 million chart-weeks analyzed.
+    </p>
+    <p>
+      <strong>Key definitions:</strong> A "foreign chart-week" occurs when a song appears on the
+      Top 200 of a country different from the artist's origin. Artist origins were determined by
+      Spotify metadata and manual verification for ambiguous cases.
+    </p>
+    <p>
+      <strong>Metrics:</strong> Export weeks (total foreign chart-weeks), longevity (median weeks
+      on a single foreign chart), spread (median number of countries reached), and collaboration
+      rate (% of exported songs featuring multiple artists).
+    </p>
+    <p>
+      <strong>Limitations:</strong> Spotify chart availability varies by country and start date.
+      Some smaller markets have data starting later than 2016. Artist origin assignment is
+      imperfect for dual-nationality or relocated artists.
+    </p>
+    <p>
+      <strong>GenAI disclosure:</strong> Claude (Anthropic) assisted with data pipeline development,
+      statistical analysis, narrative drafting, and visualization code. All findings were verified
+      against source data. The author directed all analytical choices and narrative framing.
+    </p>
+    <p style="text-align:center; margin-top:24px; color:var(--text-muted); font-size:0.85rem;">
+      Made with curiosity and joy for VizContest 2026.
+    </p>
+  </div>
+</section>
 
-<!-- ===== SCRIPTS ===== -->
 <script>
-function flagEmoji(code) {
-  if (code === 'pr') return '🇵🇷';
-  if (code === 'jm') return '🇯🇲';
-  return String.fromCodePoint(...code.toUpperCase().split('').map(c => 127397 + c.charCodeAt(0)));
+// ─── Utility ───
+const flagEmoji = code => String.fromCodePoint(...[...code.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+
+// ─── Data loading ───
+let championsData, profilesData, economyData;
+
+async function loadData() {
+  const [champ, prof, econ] = await Promise.all([
+    fetch('yearly_champions.json').then(r => r.json()),
+    fetch('country_profiles.json').then(r => r.json()),
+    fetch('music_economy.json').then(r => r.json())
+  ]);
+  championsData = champ;
+  profilesData = prof;
+  economyData = econ;
+
+  renderSongChampions();
+  renderArtistChampions();
+  populateCountrySelector();
+  renderGroupBadges();
+  animateHeroStat();
 }
 
-const ANGLO_CODES = ['us', 'gb', 'ca', 'au', 'nz', 'ie'];
-const LATIN_CODES = ['pr', 'co', 'mx', 'ar', 'cl', 'do', 'ec', 'pe', 'sv', 'gt', 'hn', 'ni', 'pa', 'py', 'uy', 've', 'bo', 'cr'];
+// ─── Hero stat counter ───
+function animateHeroStat() {
+  const el = document.querySelector('.hero-stat');
+  const target = 67;
+  let current = 0;
+  const duration = 1500;
+  const startTime = performance.now();
 
-function isAnglo(code) { return ANGLO_CODES.includes(code); }
-function isLatin(code) { return LATIN_CODES.includes(code) || code === 'es'; }
+  function tick(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    current = Math.round(target * eased);
+    el.textContent = current + '%';
+    if (progress < 1) requestAnimationFrame(tick);
+  }
 
-let economyData, profilesData, championsData;
+  // Only animate when hero is visible
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        requestAnimationFrame(tick);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  observer.observe(el);
+}
 
-Promise.all([
-  fetch('music_economy.json').then(r => r.json()),
-  fetch('country_profiles.json').then(r => r.json()),
-  fetch('yearly_champions.json').then(r => r.json()),
-]).then(([economy, profiles, champions]) => {
-  economyData = economy;
-  profilesData = profiles;
-  championsData = champions;
-
-  buildYearlySongsTable();
-  buildYearlyArtistsTable();
-  buildAngloCountries();
-  buildFortressChart();
-  buildCollabChart();
-  buildCountryGrid();
-  initScrollObserver();
-});
-
-function buildYearlySongsTable() {
-  const tbody = document.querySelector('#yearly-songs-table tbody');
-  championsData.yearly_top_song.filter(s => s.year >= 2017).forEach(s => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${s.year}</td>
-      <td>${s.name}</td>
-      <td>${s.artist}</td>
-      <td><span class="origin-badge anglo">${s.origin.toUpperCase()}</span></td>
-      <td>${s.countries} countries</td>`;
-    tbody.appendChild(tr);
+// ─── Song Champions list ───
+function renderSongChampions() {
+  const list = document.getElementById('song-champions');
+  championsData.yearly_top_song.forEach(s => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span class="year">${s.year}</span>
+      <span class="name">${flagEmoji(s.origin)} ${s.name}</span>
+      <span class="stat">${s.countries} countries</span>
+    `;
+    list.appendChild(li);
   });
 }
 
-function buildYearlyArtistsTable() {
-  const tbody = document.querySelector('#yearly-artists-table tbody');
-  championsData.yearly_top_artist.filter(a => a.year >= 2017).forEach(a => {
-    const origin = a.origin || '';
-    const lat = isLatin(origin);
-    const tr = document.createElement('tr');
-    if (lat) tr.classList.add('highlight');
-    tr.innerHTML = `
-      <td>${a.year}</td>
-      <td>${a.artist}</td>
-      <td><span class="origin-badge ${lat ? 'latin' : 'anglo'}">${origin.toUpperCase()}</span></td>
-      <td>${a.foreign_weeks ? a.foreign_weeks.toLocaleString() : ''}</td>`;
-    tbody.appendChild(tr);
+// ─── Artist Champions list ───
+function renderArtistChampions() {
+  const list = document.getElementById('artist-champions');
+  championsData.yearly_top_artist.forEach(a => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span class="year">${a.year}</span>
+      <span class="name">${a.artist}</span>
+      <span class="stat">${a.foreign_weeks.toLocaleString()}w</span>
+    `;
+    list.appendChild(li);
   });
 }
 
-function buildAngloCountries() {
-  const container = document.getElementById('anglo-countries');
-  const names = { us: 'United States', gb: 'UK', ca: 'Canada', au: 'Australia', nz: 'New Zealand', ie: 'Ireland' };
-  ANGLO_CODES.forEach(code => {
-    const chip = document.createElement('span');
-    chip.className = 'country-chip';
-    chip.textContent = `${flagEmoji(code)} ${names[code]}`;
-    container.appendChild(chip);
-  });
+// ─── Group badges ───
+function renderGroupBadges() {
+  const countries = profilesData.countries;
+
+  // Exporters: ratio > 1 and export_weeks > 500
+  const exporters = countries
+    .filter(c => c.ratio > 1 && c.export_weeks > 500)
+    .sort((a, b) => b.export_weeks - a.export_weeks)
+    .slice(0, 12);
+
+  // Open markets: pct_open > 85
+  const openMarkets = countries
+    .filter(c => c.pct_open > 85 && c.has_chart)
+    .sort((a, b) => b.pct_open - a.pct_open)
+    .slice(0, 12);
+
+  // Local champions: pct_local > 40
+  const localChamps = countries
+    .filter(c => c.pct_local > 40 && c.has_chart)
+    .sort((a, b) => b.pct_local - a.pct_local)
+    .slice(0, 12);
+
+  function renderBadges(container, list, statFn) {
+    const el = document.getElementById(container);
+    list.forEach(c => {
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = `${flagEmoji(c.code)} ${c.name} ${statFn(c)}`;
+      el.appendChild(badge);
+    });
+  }
+
+  renderBadges('exporters-badges', exporters, c => `(${(c.export_weeks/1000).toFixed(0)}k)`);
+  renderBadges('open-badges', openMarkets, c => `(${Math.round(c.pct_open)}%)`);
+  renderBadges('local-badges', localChamps, c => `(${Math.round(c.pct_local)}%)`);
 }
 
-function buildFortressChart() {
-  const container = document.getElementById('fortress-chart');
-  [
-    { name: 'Brazil', pct: 84, flag: '🇧🇷' },
-    { name: 'South Korea', pct: 72, flag: '🇰🇷' },
-    { name: 'Japan', pct: 68, flag: '🇯🇵' },
-    { name: 'France', pct: 62, flag: '🇫🇷' },
-    { name: 'India', pct: 55, flag: '🇮🇳' },
-  ].sort((a, b) => b.pct - a.pct).forEach(f => {
-    const row = document.createElement('div');
-    row.className = 'bar-chart-row';
-    row.innerHTML = `
-      <div class="bar-label">${f.flag} ${f.name}</div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width: ${f.pct}%; background: var(--confidence);">${f.pct}% local</div>
-      </div>`;
-    container.appendChild(row);
-  });
-}
-
-function buildCollabChart() {
-  const container = document.getElementById('collab-chart');
-  [
-    { name: 'Puerto Rico', pct: 72 },
-    { name: 'Colombia', pct: 72 },
-    { name: 'Mexico', pct: 58 },
-    { name: 'United States', pct: 40 },
-    { name: 'UK', pct: 35 },
-    { name: 'South Korea', pct: 22 },
-  ].forEach(d => {
-    const row = document.createElement('div');
-    row.className = 'bar-chart-row';
-    const color = d.pct > 50 ? 'var(--confidence)' : d.pct > 30 ? 'var(--accent-blue)' : 'var(--accent-purple)';
-    row.innerHTML = `
-      <div class="bar-label">${d.name}</div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width: ${d.pct}%; background: ${color};">${d.pct}% collaborations</div>
-      </div>`;
-    container.appendChild(row);
-  });
-}
-
-function buildCountryGrid() {
-  const grid = document.getElementById('country-grid');
-  const search = document.getElementById('country-search');
+// ─── Country selector ───
+function populateCountrySelector() {
+  const select = document.getElementById('country-select');
   const countries = profilesData.countries
     .filter(c => c.has_chart)
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  function render(filter = '') {
-    grid.innerHTML = '';
-    const filtered = filter
-      ? countries.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()))
-      : countries;
-    filtered.forEach(c => {
-      const btn = document.createElement('button');
-      btn.className = 'country-btn';
-      btn.textContent = `${flagEmoji(c.code)} ${c.name}`;
-      btn.onclick = () => selectCountry(c.code);
-      grid.appendChild(btn);
-    });
-  }
-
-  search.addEventListener('input', e => render(e.target.value));
-  render();
-}
-
-function selectCountry(code) {
-  const profile = profilesData.countries.find(c => c.code === code);
-  if (!profile) return;
-
-  document.querySelectorAll('.country-btn').forEach(b => b.classList.remove('selected'));
-  document.querySelectorAll('.country-btn').forEach(b => {
-    if (b.textContent.includes(profile.name)) b.classList.add('selected');
+  countries.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.code;
+    opt.textContent = `${flagEmoji(c.code)} ${c.name}`;
+    select.appendChild(opt);
   });
 
-  const el = document.getElementById('country-profile');
-  el.classList.add('visible');
-
-  document.getElementById('profile-flag').textContent = flagEmoji(code);
-  document.getElementById('profile-name').textContent = profile.name;
-
-  let archetype = '';
-  if (profile.pct_local >= 50) archetype = 'Self-Sufficient Scene';
-  else if (profile.pct_local < 5) archetype = 'Global Listener';
-  else if (isAnglo(code)) archetype = 'Global Broadcaster';
-  else if (isLatin(code) && profile.ratio >= 1) archetype = 'Latin Powerhouse';
-  else if (profile.ratio >= 1) archetype = 'Net Exporter';
-  else archetype = 'Open Market';
-  document.getElementById('profile-archetype').textContent = archetype;
-
-  const metricsEl = document.getElementById('profile-metrics');
-  metricsEl.innerHTML = '';
-  [
-    { value: `${profile.pct_local}%`, label: 'Local Music' },
-    { value: `${profile.pct_open}%`, label: 'Imported' },
-    { value: profile.export_weeks.toLocaleString(), label: 'Export Weeks' },
-    { value: `${profile.ratio}:1`, label: 'Export Ratio' },
-    { value: profile.destinations || '0', label: 'Destinations' },
-    { value: `${profile.longevity_p50 || 0}w`, label: 'Song Longevity' },
-  ].forEach(m => {
-    const div = document.createElement('div');
-    div.className = 'profile-metric';
-    div.innerHTML = `<div class="value">${m.value}</div><div class="label">${m.label}</div>`;
-    metricsEl.appendChild(div);
+  select.addEventListener('change', () => {
+    const code = select.value;
+    if (code) {
+      updateCountryProfile(code);
+      renderCountryChart(code);
+    }
   });
-
-  buildProfileChart(code);
-  document.getElementById('profile-narrative').innerHTML = generateNarrative(profile, code);
-  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function buildProfileChart(code) {
-  const container = document.getElementById('profile-chart');
+function updateCountryProfile(code) {
+  const profile = document.getElementById('country-profile');
+  const country = profilesData.countries.find(c => c.code === code);
+  if (!country) return;
+
+  profile.style.display = 'grid';
+  document.getElementById('prof-export').textContent = country.export_weeks.toLocaleString();
+  document.getElementById('prof-local').textContent = country.pct_local.toFixed(1) + '%';
+  document.getElementById('prof-longevity').textContent = country.longevity_p50 + 'w';
+  document.getElementById('prof-spread').textContent = country.spread_p50 + ' countries';
+}
+
+// ─── D3 Chart ───
+function renderCountryChart(code) {
+  const container = document.getElementById('country-chart');
+  const emptyMsg = document.getElementById('chart-empty-msg');
   container.innerHTML = '';
-  const ts = economyData.time_series[code];
-  if (!ts || ts.length === 0) return;
 
-  const data = ts.filter(d => d.year >= 2017).map(d => ({
-    year: d.year, local: d.reach.pct_local
+  const ts = economyData.time_series[code];
+  if (!ts || ts.length === 0) {
+    emptyMsg.style.display = 'block';
+    return;
+  }
+  emptyMsg.style.display = 'none';
+
+  const data = ts.map(d => ({
+    year: d.year,
+    value: d.reach.export_weeks
   }));
 
-  const margin = { top: 25, right: 20, bottom: 35, left: 45 };
-  const width = 600 - margin.left - margin.right;
-  const height = 160 - margin.top - margin.bottom;
+  const rect = container.getBoundingClientRect();
+  const margin = { top: 20, right: 24, bottom: 36, left: 56 };
+  const width = rect.width - margin.left - margin.right;
+  const height = rect.height - margin.top - margin.bottom;
 
-  const svg = d3.select(container).append('svg')
-    .attr('viewBox', `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-    .attr('width', '100%')
-    .append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+  const svg = d3.select(container)
+    .append('svg')
+    .attr('viewBox', `0 0 ${rect.width} ${rect.height}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
 
-  const x = d3.scaleLinear().domain(d3.extent(data, d => d.year)).range([0, width]);
-  const y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+  const g = svg.append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
 
-  svg.append('path').datum(data)
-    .attr('d', d3.area().x(d => x(d.year)).y0(height).y1(d => y(d.local)).curve(d3.curveMonotoneX))
-    .attr('fill', 'rgba(2, 208, 152, 0.15)')
-    .attr('stroke', '#02D098').attr('stroke-width', 2);
+  const x = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.year))
+    .range([0, width]);
 
-  svg.append('g').attr('transform', `translate(0,${height})`)
-    .call(d3.axisBottom(x).ticks(data.length).tickFormat(d3.format('d')))
-    .call(g => g.select('.domain').attr('stroke', '#ccc'))
-    .call(g => g.selectAll('text').attr('fill', '#888').attr('font-size', '9px'))
-    .call(g => g.selectAll('line').attr('stroke', '#eee'));
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.value) * 1.1])
+    .range([height, 0]);
 
-  svg.append('g')
-    .call(d3.axisLeft(y).ticks(4).tickFormat(d => d + '%'))
-    .call(g => g.select('.domain').attr('stroke', '#ccc'))
-    .call(g => g.selectAll('text').attr('fill', '#888').attr('font-size', '9px'))
-    .call(g => g.selectAll('line').attr('stroke', '#f5f5f5'));
+  // Area
+  const area = d3.area()
+    .x(d => x(d.year))
+    .y0(height)
+    .y1(d => y(d.value))
+    .curve(d3.curveMonotoneX);
 
-  svg.append('text').attr('x', width / 2).attr('y', -10)
-    .attr('text-anchor', 'middle').attr('fill', '#888').attr('font-size', '10px')
-    .text('% Local Music Over Time');
+  g.append('path')
+    .datum(data)
+    .attr('class', 'chart-area')
+    .attr('d', area);
+
+  // Line
+  const line = d3.line()
+    .x(d => x(d.year))
+    .y(d => y(d.value))
+    .curve(d3.curveMonotoneX);
+
+  g.append('path')
+    .datum(data)
+    .attr('class', 'chart-line')
+    .attr('d', line);
+
+  // Dots
+  g.selectAll('.chart-dot')
+    .data(data)
+    .enter()
+    .append('circle')
+    .attr('class', 'chart-dot')
+    .attr('cx', d => x(d.year))
+    .attr('cy', d => y(d.value))
+    .attr('r', 4);
+
+  // Labels on dots
+  g.selectAll('.chart-tooltip')
+    .data(data)
+    .enter()
+    .append('text')
+    .attr('class', 'chart-tooltip')
+    .attr('x', d => x(d.year))
+    .attr('y', d => y(d.value) - 10)
+    .attr('text-anchor', 'middle')
+    .text(d => d.value > 0 ? d.value : '');
+
+  // X axis
+  g.append('g')
+    .attr('class', 'axis')
+    .attr('transform', `translate(0,${height})`)
+    .call(d3.axisBottom(x).ticks(data.length).tickFormat(d3.format('d')));
+
+  // Y axis
+  g.append('g')
+    .attr('class', 'axis')
+    .call(d3.axisLeft(y).ticks(5).tickFormat(d => d >= 1000 ? (d/1000).toFixed(0) + 'k' : d));
+
+  // Y label
+  g.append('text')
+    .attr('transform', 'rotate(-90)')
+    .attr('y', -44)
+    .attr('x', -height / 2)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '11px')
+    .style('fill', 'var(--text-muted)')
+    .text('Export weeks');
 }
 
-function generateNarrative(profile, code) {
-  const name = profile.name;
-  const pctLocal = profile.pct_local;
-  const ratio = profile.ratio;
-  const exports = profile.export_weeks;
-  const dest = profile.destinations || 0;
+// ─── IntersectionObserver for nav dots + fade animations ───
+function setupObservers() {
+  const sections = document.querySelectorAll('.slide');
+  const dots = document.querySelectorAll('.nav-dot');
 
-  let n = '';
-  if (pctLocal >= 70) {
-    n = `<strong>${pctLocal}% of your charts is local music.</strong> ${name} has a thriving scene that fills its own room first. The world sends music your way, but your own artists have the home crowd.`;
-  } else if (pctLocal >= 40) {
-    n = `<strong>${pctLocal}% local.</strong> ${name} keeps a healthy balance -- its own artists hold strong, while welcoming great music from abroad. The best of both worlds.`;
-  } else if (pctLocal >= 10) {
-    n = `<strong>${pctLocal}% local.</strong> ${name} is an open market -- most of what you hear traveled from somewhere else. Your taste is shaped by the countries that share music with you.`;
-  } else {
-    n = `<strong>${pctLocal}% local.</strong> ${name} is one of the most globally-connected music markets on Earth. Your playlist is basically a world tour.`;
-  }
-
-  if (ratio >= 10) {
-    n += ` And with a ${ratio}:1 export ratio, ${name} is a major cultural broadcaster -- sending far more music out than it takes in.`;
-  } else if (ratio >= 1) {
-    n += ` With a ${ratio}:1 ratio, ${name} gives back as much as it receives.`;
-  }
-
-  if (dest > 50) n += ` Its music reaches ${dest} countries -- truly global.`;
-  else if (dest > 20) n += ` Its music reaches ${dest} countries.`;
-
-  n += `<br><br><em>This is how ${name} connects with the world through music.</em>`;
-  return n;
-}
-
-function initScrollObserver() {
-  const observer = new IntersectionObserver((entries) => {
+  // Nav dots observer
+  const navObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        const el = entry.target;
-        el.classList.add('is-active');
-        const id = el.id;
+        const idx = [...sections].indexOf(entry.target);
+        dots.forEach(d => d.classList.remove('active'));
+        if (dots[idx]) dots[idx].classList.add('active');
+      }
+    });
+  }, { threshold: 0.5 });
 
-        if (id === 'content-imports') {
-          setTimeout(() => {
-            document.querySelector('.stat-bar-imported').style.width = '67%';
-            document.querySelector('.stat-bar-local').style.width = '33%';
-          }, 300);
-        }
-        if (id === 'content-song-reveal') triggerReveal(['suspense-1', 'suspense-2', 'suspense-3', 'song-reveal', 'song-stat'], 400);
-        if (id === 'content-artist-reveal') triggerReveal(['artist-suspense-1', 'artist-suspense-2', 'artist-suspense-3', 'artist-reveal', 'artist-stat'], 400);
+  sections.forEach(section => navObserver.observe(section));
 
-        observer.unobserve(el);
+  // Dot click handlers
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const idx = parseInt(dot.dataset.section);
+      sections[idx].scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Fade-in animation observer
+  const fadeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
       }
     });
   }, { threshold: 0.15 });
 
-  document.querySelectorAll('.scroll-content').forEach(el => observer.observe(el));
-  document.getElementById('content-methodology').classList.add('is-active');
-  document.getElementById('content-your-country').classList.add('is-active');
+  document.querySelectorAll('.fade-in').forEach(el => fadeObserver.observe(el));
 }
 
-function triggerReveal(ids, delay) {
-  ids.forEach((id, i) => {
-    setTimeout(() => document.getElementById(id).classList.add('show'), delay * (i + 1));
-  });
-}
+// ─── Init ───
+document.addEventListener('DOMContentLoaded', () => {
+  setupObservers();
+  loadData();
+});
 </script>
+
 </body>
 </html>
