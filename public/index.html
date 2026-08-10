@@ -264,38 +264,32 @@ async function renderHeroMap() {
     })
     .attr('r', d => 6 + Math.random() * 8);
 
-  // Animate bubbles: gentle floating pulse
-  function animateBubbles() {
-    bubbles
+  // Sequential animation: one country lights up at a time
+  let currentIdx = 0;
+
+  function pulseNext() {
+    // Reset previous bubble
+    bubbles.attr('r', 6).attr('opacity', 0.3);
+
+    // Pulse current bubble
+    const current = d3.select(bubbles.nodes()[currentIdx]);
+    current
       .transition()
-      .duration(2000 + Math.random() * 2000)
-      .ease(d3.easeSinInOut)
-      .attr('r', () => 5 + Math.random() * 12)
-      .attr('opacity', () => 0.3 + Math.random() * 0.5)
-      .on('end', function() {
-        d3.select(this)
-          .transition()
-          .duration(2000 + Math.random() * 2000)
-          .ease(d3.easeSinInOut)
-          .attr('r', () => 5 + Math.random() * 12)
-          .attr('opacity', () => 0.3 + Math.random() * 0.5)
-          .on('end', function() { animateSingle(d3.select(this)); });
-      });
+      .duration(400)
+      .ease(d3.easeCubicOut)
+      .attr('r', 18)
+      .attr('opacity', 0.9)
+      .transition()
+      .duration(600)
+      .ease(d3.easeCubicIn)
+      .attr('r', 8)
+      .attr('opacity', 0.5);
+
+    currentIdx = (currentIdx + 1) % CHART_COUNTRIES.length;
+    setTimeout(pulseNext, 1200);
   }
 
-  function animateSingle(sel) {
-    sel.transition()
-      .duration(2000 + Math.random() * 2000)
-      .ease(d3.easeSinInOut)
-      .attr('r', () => 5 + Math.random() * 12)
-      .attr('opacity', () => 0.3 + Math.random() * 0.5)
-      .on('end', function() { animateSingle(d3.select(this)); });
-  }
-
-  // Stagger start
-  bubbles.each(function(d, i) {
-    setTimeout(() => animateSingle(d3.select(this)), i * 80);
-  });
+  pulseNext();
 }
 
 renderHeroMap();
