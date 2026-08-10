@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Music Connects the World | VizContest 2026</title>
+<meta name="description" content="67% of what we stream comes from another country. A data story about how music crosses every border.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root {
+  --sans: 'DM Sans', sans-serif;
+  --serif: 'Lora', serif;
+  --bg: #fff6df;
+  --text: #262626;
+  --text-muted: #6d6d6d;
+  --gray-300: #cacaca;
+  --serenade: #F2C3FF;
+  --heartache: #5CAFFF;
+  --confidence: #FF5C00;
+  --complicated: #96753C;
+  --riddance: #A290E9;
+  --self-love: #FFD700;
+  --pursuit: #02D098;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Progress bar */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--pursuit);
+  z-index: 9999;
+  transition: width 50ms linear;
+}
+
+/* Article container */
+.article {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+
+/* Hero */
+.hero {
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+
+.hero h1 {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(1.8rem, 6vw, 3rem);
+  line-height: 1.1;
+  margin: 0 0 16px 0;
+}
+
+.hero .subtitle {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  color: var(--text-muted);
+  margin: 0 0 16px 0;
+}
+
+.hero .stat-hook {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(2.4rem, 8vw, 4rem);
+  color: var(--confidence);
+  margin: 0 0 8px 0;
+}
+
+.hero .stat-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Headings */
+h2 {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(1.2rem, 4vw, 1.6rem);
+  margin: 48px 0 16px 0;
+  line-height: 1.2;
+}
+
+h3 {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  margin: 32px 0 12px 0;
+}
+
+/* Paragraphs */
+p {
+  margin: 16px 0;
+}
+
+/* Pull quote */
+.pull-quote {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  color: var(--text);
+  margin: 24px 0;
+  line-height: 1.3;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 0.85rem;
+}
+
+th {
+  font-family: var(--sans);
+  font-weight: 700;
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 2px solid var(--text);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--gray-300);
+  vertical-align: middle;
+}
+
+tr:last-child td { border-bottom: none; }
+
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.badge-anglophone { background: var(--heartache); color: #fff; }
+.badge-latin { background: var(--confidence); color: #fff; }
+.badge-kpop { background: var(--riddance); color: #fff; }
+.badge-other { background: var(--gray-300); color: var(--text); }
+
+/* Spotify embeds */
+.spotify-embed {
+  margin: 16px 0;
+}
+
+.spotify-embed iframe {
+  border-radius: 12px;
+  width: 100%;
+  height: 80px;
+  border: none;
+}
+
+/* Country selector */
+.country-selector {
+  margin: 16px 0;
+}
+
+.country-selector select {
+  font-family: var(--sans);
+  font-size: 1rem;
+  padding: 8px 12px;
+  border: 2px solid var(--text);
+  border-radius: 4px;
+  background: var(--bg);
+  width: 100%;
+  max-width: 320px;
+  cursor: pointer;
+}
+
+/* Profile card */
+.profile-card {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid var(--gray-300);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.4);
+}
+
+.profile-card h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.profile-stat {
+  font-family: var(--sans);
+}
+
+.profile-stat .label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.profile-stat .value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* D3 chart */
+.chart-container {
+  margin: 16px 0;
+  width: 100%;
+}
+
+.chart-container svg {
+  width: 100%;
+  height: auto;
+}
+
+.chart-container .axis text {
+  font-family: var(--sans);
+  font-size: 11px;
+  fill: var(--text-muted);
+}
+
+.chart-container .axis line,
+.chart-container .axis path {
+  stroke: var(--gray-300);
+}
+
+.chart-container .line {
+  fill: none;
+  stroke: var(--confidence);
+  stroke-width: 2.5;
+}
+
+.chart-container .area {
+  fill: var(--confidence);
+  opacity: 0.1;
+}
+
+/* Reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Methodology */
+.methodology {
+  margin: 48px 0 32px 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--gray-300);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.methodology h2 {
+  font-size: 1rem;
+  margin: 0 0 12px 0;
+  color: var(--text-muted);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 32px 0;
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+  .article { padding: 0 24px; }
+  .hero { padding: 0 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Hero -->
+<section class="hero">
+  <p class="subtitle">A data story about streaming charts, 2016 to 2025</p>
+  <h1>Your playlist is more international than you think.</h1>
+  <div class="stat-hook">67%</div>
+  <p class="stat-label">of chart-weeks worldwide belong to artists from another country. We are all listening across borders, every single day.</p>
+</section>
+
+<!-- Article body -->
+<div class="article">
+
+<p class="reveal">Here is something wonderful: when you press play on Spotify, you are almost certainly listening to someone from a different country. Not sometimes. Most of the time. Across 70 countries and nine years of chart data, two-thirds of what we stream was made somewhere else.</p>
+
+<p class="reveal">That means music is doing what diplomacy, trade deals, and social media only dream of. It is connecting us. Quietly, joyfully, without anyone needing a visa.</p>
+
+<p class="reveal">Let us look at how.</p>
+
+<!-- The Song -->
+<h2 class="reveal">The Song That Went Everywhere</h2>
+
+<p class="reveal">Every year, one song travels farther than any other. It accumulates "foreign chart-weeks" by appearing on Top 200 charts in countries outside its home. The all-time champion?</p>
+
+<p class="pull-quote reveal">Blinding Lights by The Weeknd: 7,051 foreign chart-weeks across 67 countries.</p>
+
+<div class="spotify-embed reveal">
+<iframe src="https://open.spotify.com/embed/track/0VjIjW4GlUZAMYd2vXMi3b?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
+<p class="reveal">That is not a fluke. Every year from 2016 to 2025, a single song managed to show up on charts in 54 to 66 countries simultaneously. Here are the yearly champions:</p>
+
+<table class="reveal" id="songsTable">
+<thead>
+<tr><th>Year</th><th>Song</th><th>Artist</th><th>Origin</th><th class="num">Weeks</th><th class="num">Countries</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<p class="reveal">Notice how the origins bounce around: Canada, UK, US, Australia. English-language songs dominate this list because they spread wide. But hold that thought, because spread is only one strategy.</p>
+
+<div class="spotify-embed reveal">
+<iframe src="https://open.spotify.com/embed/track/7qiZfU4dY1lWllzX7mPBI3?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
+<div class="spotify-embed reveal">
+<iframe src="https://open.spotify.com/embed/track/1rgnBhdG2JDFTbYkYRZAku?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
+<!-- The Artist -->
+<h2 class="reveal">The Artist Who Changed Everything</h2>
+
+<p class="reveal">Songs are sprints. Artists are marathons. And when we zoom out from individual tracks to entire catalogs, the picture flips completely.</p>
+
+<p class="pull-quote reveal">Bad Bunny: 126,075 foreign chart-weeks. More than double the #2 artist.</p>
+
+<p class="reveal">That number is staggering. J Balvin, the runner-up, has 50,462. Ozuna sits at 43,340. The top of this list is overwhelmingly Latin: reggaeton, Latin trap, Latin pop. Artists from Puerto Rico and Colombia dominate in a way that English-language acts simply cannot match for sustained presence.</p>
+
+<div class="spotify-embed reveal">
+<iframe src="https://open.spotify.com/embed/track/4MzXwWMhyBbmu6hOcLVD49?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
+<p class="reveal">Look at who held the #1 artist spot each year:</p>
+
+<table class="reveal" id="artistsTable">
+<thead>
+<tr><th>Year</th><th>Artist</th><th class="num">Foreign Weeks</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<p class="reveal">Latin artists won 8 out of 10 years. Bad Bunny alone claimed five of those. This is not a trend. It is an era.</p>
+
+<div class="spotify-embed reveal">
+<iframe src="https://open.spotify.com/embed/track/1IHWl5LamUGT3TwnHxBkN8?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
+<!-- The Paradox -->
+<h2 class="reveal">The Paradox: Width vs. Depth</h2>
+
+<p class="reveal">So English songs win at spread (appearing in the most countries) while Latin artists win at longevity (staying on charts the longest). Two completely different strategies for connecting across borders.</p>
+
+<p class="reveal">The numbers tell the story clearly. A typical English-language export lasts about 11 weeks on a foreign chart, reaching 3 countries on average. A typical Latin export? 30 weeks, reaching 5 countries. Half the spread, triple the staying power.</p>
+
+<p class="pull-quote reveal">English music goes everywhere briefly. Latin music goes somewhere and stays forever.</p>
+
+<p class="reveal">Think of it this way: an Ed Sheeran track might appear on 58 charts for a few months each. A Bad Bunny track might only reach 20 charts, but it stays for over half a year on each one. Both strategies generate massive foreign chart-weeks. They just do it differently.</p>
+
+<div class="spotify-embed reveal">
+<iframe src="https://open.spotify.com/embed/track/6habFhsOp2NvshLv26DqMb?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
+<!-- The Groups -->
+<h2 class="reveal">Three Ways Countries Connect</h2>
+
+<p class="reveal">Not every country participates in this global music economy the same way. We can group them into three broad patterns:</p>
+
+<h3 class="reveal">Global Broadcasters</h3>
+<p class="reveal">The US and UK are the superpowers here. The US alone accounts for 772,650 foreign chart-weeks across our dataset, with 76% of its own chart being domestic artists. The UK contributes 251,851 export-weeks. These countries produce music that goes everywhere, and their home audiences mainly listen to their own output. They broadcast outward.</p>
+
+<h3 class="reveal">Self-Sufficient Scenes</h3>
+<p class="reveal">Japan (72.5% local) and South Korea (71.6% local) have huge domestic markets that primarily consume homegrown music. But unlike the US and UK, their exports are more concentrated: K-pop travels through dedicated fanbases to specific markets, while J-pop mostly stays regional. They are self-sufficient but increasingly leaking outward.</p>
+
+<h3 class="reveal">Regional Bridges</h3>
+<p class="reveal">Colombia is the perfect example. With 142,004 export-weeks, it punches way above its weight by serving as the bridge to all of Latin America and increasingly the world. Its music reaches a median of 5 countries per export and stays for 30 weeks. Colombia does not just make music for itself. It makes music for an entire linguistic region, and that region is enormous.</p>
+
+<div class="spotify-embed reveal">
+<iframe src="https://open.spotify.com/embed/track/0fea68AdmYNygeTGI4RC18?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
+<!-- The Latin Secret -->
+<h2 class="reveal">Why Latin Music Dominates</h2>
+
+<p class="reveal">Three factors explain why Latin artists accumulate so many more foreign chart-weeks than anyone else:</p>
+
+<h3 class="reveal">1. Collaboration Culture</h3>
+<p class="reveal">Puerto Rico's export tracks have a 63.8% collaboration rate. Colombia's is 58.4%. Compare that to the UK (32.9%) or South Korea (22.1%). When every song features two or three artists, each one brings their audience along. Collabs are not just creative choices. They are distribution strategies.</p>
+
+<h3 class="reveal">2. Extraordinary Longevity</h3>
+<p class="reveal">A Latin export stays on foreign charts for a median of 24 to 30 weeks. An English-language export: 10 to 11 weeks. A K-pop export: 9 weeks. Latin music does not burn bright and fade. It smolders for months.</p>
+
+<h3 class="reveal">3. Concentration</h3>
+<p class="reveal">Bad Bunny alone accounts for 22.9% of all Puerto Rico's export-weeks. One artist, nearly a quarter of an entire territory's global presence. This kind of concentration means that when the top artist releases an album, the whole country's chart presence surges worldwide.</p>
+
+<div class="spotify-embed reveal">
+<iframe src="https://open.spotify.com/embed/track/2Fxmhks0bxGSBdJ92vM42m?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
+<p class="pull-quote reveal">Collaboration, longevity, star power. Three ingredients that turned reggaeton into the world's most persistent musical export.</p>
+
+<div class="spotify-embed reveal">
+<iframe src="https://open.spotify.com/embed/track/4Dvkj6JhhA12EX05fT7y2e?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
+<!-- Your Country -->
+<h2 class="reveal">How Does Your Country Connect?</h2>
+
+<p class="reveal">Every country in our dataset has its own story. Some are net exporters, sending music outward. Others are wide open, absorbing sounds from across the world. Most are a mix. Pick yours and see:</p>
+
+<div class="country-selector reveal">
+<select id="countrySelect">
+<option value="">Choose a country...</option>
+</select>
+</div>
+
+<div id="profileSection" style="display:none;">
+<div class="profile-card" id="profileCard">
+<h3 id="profileTitle"></h3>
+<div class="profile-stats" id="profileStats"></div>
+</div>
+<div class="chart-container" id="chartContainer"></div>
+</div>
+
+<div class="spotify-embed reveal">
+<iframe src="https://open.spotify.com/embed/track/02MWAaffLxlfxAUY7c5dvx?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
+<div class="spotify-embed reveal">
+<iframe src="https://open.spotify.com/embed/track/7qEHsqek33rTcFNT9PFqLf?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
+<!-- Closing -->
+<h2 class="reveal">You Are Already Part of This</h2>
+
+<p class="reveal">Every time you add a song to your playlist, you are participating in something bigger than personal taste. You are pulling a thread that connects you to a producer in Seoul, a singer in Medellin, a band in Melbourne, a rapper in Lagos.</p>
+
+<p class="reveal">Music does not need translation. It does not need a passport. It just needs someone to press play.</p>
+
+<p class="pull-quote reveal">67% foreign. 70 countries. Nine years. One playlist at a time, we are building something beautiful together.</p>
+
+<p class="reveal">So keep listening. Keep discovering. Every stream is a tiny vote for a more connected world.</p>
+
+<div class="spotify-embed reveal">
+<iframe src="https://open.spotify.com/embed/track/6dOtVTDdiauQNBQEDOtlAB?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
+<!-- Methodology -->
+<div class="methodology reveal">
+<h2>Methodology</h2>
+<p>Data sourced from Spotify's Weekly Top 200 charts across approximately 70 countries, spanning January 2016 through June 2025. A "foreign chart-week" is defined as one week where a track appears on a Top 200 chart outside its artist's home country. Artist origins were determined by Spotify metadata and manual verification. Country-level metrics (longevity, spread, openness) are computed from the full 9-year panel.</p>
+<p style="margin-top:12px;"><strong>GenAI disclosure:</strong> This story was developed with assistance from generative AI tools for data processing, narrative drafting, and code generation. All data analysis, editorial decisions, and fact-checking were performed by the author.</p>
+<p style="margin-top:12px;"><strong>Tools:</strong> D3.js, Spotify Web API, Python (pandas), Claude.</p>
+<p style="margin-top:12px;"><a href="https://github.com" style="color: var(--confidence);">View source on GitHub</a></p>
+</div>
+
+<div class="footer">
+VizContest 2026 Entry
+</div>
+
+</div><!-- .article -->
+
+<script>
+// Flag emoji helper
+const flagEmoji = code => String.fromCodePoint(...[...code.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+
+// Format numbers with commas
+const fmt = n => n != null ? n.toLocaleString() : 'N/A';
+
+// Progress bar
+const progressBar = document.getElementById('progressBar');
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  progressBar.style.width = progress + '%';
+});
+
+// IntersectionObserver for reveal animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Load data
+let countryProfiles, musicEconomy, yearlyChampions;
+
+Promise.all([
+  fetch('yearly_champions.json').then(r => r.json()),
+  fetch('country_profiles.json').then(r => r.json()),
+  fetch('music_economy.json').then(r => r.json())
+]).then(([champions, profiles, economy]) => {
+  yearlyChampions = champions;
+  countryProfiles = profiles;
+  musicEconomy = economy;
+
+  renderSongsTable(champions.yearly_top_song);
+  renderArtistsTable(champions.yearly_top_artist);
+  populateCountrySelector(profiles.countries);
+});
+
+function renderSongsTable(songs) {
+  const tbody = document.querySelector('#songsTable tbody');
+  tbody.innerHTML = songs.map(s => {
+    const origin = s.origin ? flagEmoji(s.origin) : '';
+    return `<tr>
+      <td>${s.year}</td>
+      <td>${s.name}</td>
+      <td>${s.artist.split('|')[0]}</td>
+      <td>${origin} ${s.origin ? s.origin.toUpperCase() : ''}</td>
+      <td class="num">${fmt(s.foreign_weeks)}</td>
+      <td class="num">${s.countries}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderArtistsTable(artists) {
+  const tbody = document.querySelector('#artistsTable tbody');
+  tbody.innerHTML = artists.map(a => {
+    return `<tr>
+      <td>${a.year}</td>
+      <td>${a.artist}</td>
+      <td class="num">${fmt(a.foreign_weeks)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function populateCountrySelector(countries) {
+  const select = document.getElementById('countrySelect');
+  const charted = countries.filter(c => c.has_chart).sort((a, b) => a.name.localeCompare(b.name));
+  charted.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.code;
+    opt.textContent = `${flagEmoji(c.code)} ${c.name}`;
+    select.appendChild(opt);
+  });
+
+  select.addEventListener('change', (e) => {
+    if (e.target.value) {
+      showCountryProfile(e.target.value);
+    } else {
+      document.getElementById('profileSection').style.display = 'none';
+    }
+  });
+}
+
+function showCountryProfile(code) {
+  const section = document.getElementById('profileSection');
+  section.style.display = 'block';
+
+  const country = countryProfiles.countries.find(c => c.code === code);
+  if (!country) return;
+
+  // Title
+  document.getElementById('profileTitle').textContent = `${flagEmoji(code)} ${country.name}`;
+
+  // Stats
+  const stats = document.getElementById('profileStats');
+  const openness = country.pct_open != null ? country.pct_open.toFixed(1) + '%' : 'N/A';
+  stats.innerHTML = `
+    <div class="profile-stat"><div class="label">Export Weeks</div><div class="value">${fmt(country.export_weeks)}</div></div>
+    <div class="profile-stat"><div class="label">% Local</div><div class="value">${country.pct_local != null ? country.pct_local.toFixed(1) + '%' : 'N/A'}</div></div>
+    <div class="profile-stat"><div class="label">Longevity (median)</div><div class="value">${country.longevity_p50 != null ? country.longevity_p50 + 'w' : 'N/A'}</div></div>
+    <div class="profile-stat"><div class="label">Spread (median)</div><div class="value">${country.spread_p50 != null ? country.spread_p50 + ' countries' : 'N/A'}</div></div>
+    <div class="profile-stat"><div class="label">Destinations</div><div class="value">${country.destinations != null ? country.destinations : 'N/A'}</div></div>
+    <div class="profile-stat"><div class="label">Openness</div><div class="value">${openness}</div></div>
+    <div class="profile-stat"><div class="label">Collab Rate</div><div class="value">${country.collab_pct != null ? country.collab_pct.toFixed(1) + '%' : 'N/A'}</div></div>
+    <div class="profile-stat"><div class="label">Language Group</div><div class="value">${country.language_group || 'N/A'}</div></div>
+  `;
+
+  // D3 chart
+  renderTimeSeriesChart(code);
+}
+
+function renderTimeSeriesChart(code) {
+  const container = document.getElementById('chartContainer');
+  container.innerHTML = '';
+
+  const timeSeries = musicEconomy.time_series[code];
+  if (!timeSeries || timeSeries.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">No time-series data available for this country.</p>';
+    return;
+  }
+
+  const data = timeSeries.map(d => ({
+    year: d.year,
+    value: d.reach ? d.reach.export_weeks : 0
+  })).filter(d => d.value != null);
+
+  if (data.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">No export data available.</p>';
+    return;
+  }
+
+  const margin = { top: 20, right: 16, bottom: 32, left: 48 };
+  const width = Math.min(container.clientWidth, 680);
+  const height = 200;
+  const innerW = width - margin.left - margin.right;
+  const innerH = height - margin.top - margin.bottom;
+
+  const svg = d3.select(container)
+    .append('svg')
+    .attr('viewBox', `0 0 ${width} ${height}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+  const g = svg.append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.year))
+    .range([0, innerW]);
+
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.value)])
+    .nice()
+    .range([innerH, 0]);
+
+  // Area
+  const area = d3.area()
+    .x(d => x(d.year))
+    .y0(innerH)
+    .y1(d => y(d.value))
+    .curve(d3.curveMonotoneX);
+
+  g.append('path')
+    .datum(data)
+    .attr('class', 'area')
+    .attr('d', area);
+
+  // Line
+  const line = d3.line()
+    .x(d => x(d.year))
+    .y(d => y(d.value))
+    .curve(d3.curveMonotoneX);
+
+  g.append('path')
+    .datum(data)
+    .attr('class', 'line')
+    .attr('d', line);
+
+  // Dots
+  g.selectAll('.dot')
+    .data(data)
+    .enter()
+    .append('circle')
+    .attr('cx', d => x(d.year))
+    .attr('cy', d => y(d.value))
+    .attr('r', 3)
+    .attr('fill', 'var(--confidence)');
+
+  // Axes
+  g.append('g')
+    .attr('class', 'axis')
+    .attr('transform', `translate(0,${innerH})`)
+    .call(d3.axisBottom(x).ticks(data.length).tickFormat(d3.format('d')));
+
+  g.append('g')
+    .attr('class', 'axis')
+    .call(d3.axisLeft(y).ticks(4).tickFormat(d => d >= 1000 ? (d/1000).toFixed(0) + 'k' : d));
+
+  // Label
+  svg.append('text')
+    .attr('x', margin.left)
+    .attr('y', 12)
+    .attr('font-family', 'var(--sans)')
+    .attr('font-size', '11px')
+    .attr('fill', 'var(--text-muted)')
+    .text('Export chart-weeks by year');
+}
+</script>
+</body>
+</html>

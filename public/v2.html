@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How Music Connects the World | VizCon 2026</title>
+  <meta name="description" content="67% of global charts feature foreign artists. A joyful exploration of how music crosses every border.">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sans: 'DM Sans', sans-serif;
+      --serif: 'Lora', serif;
+      --bg: #fff6df;
+      --text: #262626;
+      --text-muted: #6d6d6d;
+      --gray-300: #cacaca;
+      --serenade: #F2C3FF;
+      --heartache: #5CAFFF;
+      --confidence: #FF5C00;
+      --complicated: #96753C;
+      --riddance: #A290E9;
+      --self-love: #FFD700;
+      --pursuit: #02D098;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--serif);
+      font-size: 16px;
+      line-height: 1.4;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, h5 {
+      font-family: var(--sans);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    p { margin: 16px 0; }
+
+    /* Hero */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100svh;
+      padding: 24px 16px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 8vw, 3.5rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero .subtitle {
+      font-size: clamp(1.1rem, 3vw, 1.4rem);
+      color: var(--text-muted);
+      max-width: 520px;
+      margin: 0 auto 24px;
+    }
+
+    .hero .stat-big {
+      font-family: var(--sans);
+      font-size: clamp(3.5rem, 12vw, 6rem);
+      font-weight: 800;
+      color: var(--confidence);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .hero .stat-label {
+      font-family: var(--sans);
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .hero .scroll-hint {
+      margin-top: 32px;
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--gray-300);
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+
+    /* Cards container */
+    .cards {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 16px 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    /* Base card */
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      padding: 24px;
+      width: 100%;
+      max-width: 720px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card--narrow {
+      max-width: 560px;
+    }
+
+    .card--wide {
+      max-width: 720px;
+    }
+
+    .card--border-left {
+      border-left: 4px solid var(--confidence);
+    }
+
+    .card--border-left-blue {
+      border-left: 4px solid var(--heartache);
+    }
+
+    .card--border-left-purple {
+      border-left: 4px solid var(--riddance);
+    }
+
+    .card--border-left-green {
+      border-left: 4px solid var(--pursuit);
+    }
+
+    .card--border-top {
+      border-top: 4px solid var(--pursuit);
+    }
+
+    .card h2 {
+      font-size: clamp(1.3rem, 4vw, 1.8rem);
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      font-size: clamp(1.1rem, 3vw, 1.4rem);
+      margin-bottom: 8px;
+    }
+
+    .card h4 {
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+
+    .badge--anglophone { background: var(--heartache); color: #fff; }
+    .badge--spanish { background: var(--confidence); color: #fff; }
+    .badge--portuguese { background: var(--confidence); color: #fff; }
+    .badge--other { background: var(--riddance); color: #fff; }
+    .badge--east_asian { background: var(--riddance); color: #fff; }
+    .badge--nordic { background: var(--serenade); color: var(--text); }
+    .badge--southeast_asian { background: var(--pursuit); color: #fff; }
+    .badge--south_asian { background: var(--self-love); color: var(--text); }
+
+    /* Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--sans);
+      font-size: 14px;
+      margin: 16px 0;
+    }
+
+    .data-table th {
+      text-align: left;
+      padding: 8px 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--gray-300);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .data-table td {
+      padding: 10px 12px;
+      vertical-align: middle;
+    }
+
+    .data-table tr:nth-child(even) td {
+      background: #fffdf5;
+    }
+
+    .data-table .num {
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    /* Spotify embed card */
+    .card--embed {
+      padding: 16px;
+      max-width: 560px;
+    }
+
+    .card--embed iframe {
+      border-radius: 12px;
+    }
+
+    /* Country selector */
+    .selector-wrap {
+      margin: 16px 0;
+    }
+
+    .selector-wrap select {
+      font-family: var(--sans);
+      font-size: 16px;
+      padding: 12px 16px;
+      border: 2px solid var(--gray-300);
+      border-radius: 12px;
+      background: #fff;
+      width: 100%;
+      max-width: 320px;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23262626' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+    }
+
+    .selector-wrap select:focus {
+      outline: none;
+      border-color: var(--pursuit);
+    }
+
+    /* Profile grid */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .profile-stat {
+      background: #fffdf5;
+      border-radius: 12px;
+      padding: 12px 16px;
+    }
+
+    .profile-stat .label {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    .profile-stat .value {
+      font-family: var(--sans);
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* D3 chart */
+    .chart-container {
+      width: 100%;
+      margin: 16px 0;
+      min-height: 200px;
+    }
+
+    .chart-container svg {
+      width: 100%;
+      height: 200px;
+      overflow: visible;
+    }
+
+    .chart-container .axis text {
+      font-family: var(--sans);
+      font-size: 11px;
+      fill: var(--text-muted);
+    }
+
+    .chart-container .axis line,
+    .chart-container .axis path {
+      stroke: var(--gray-300);
+    }
+
+    .chart-container .line {
+      fill: none;
+      stroke: var(--pursuit);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .chart-container .area {
+      fill: var(--pursuit);
+      opacity: 0.1;
+    }
+
+    .chart-container .dot {
+      fill: var(--pursuit);
+    }
+
+    /* Highlight text */
+    .highlight {
+      background: linear-gradient(to top, rgba(2,208,152,0.2) 40%, transparent 40%);
+      padding: 0 2px;
+    }
+
+    .highlight--orange {
+      background: linear-gradient(to top, rgba(255,92,0,0.15) 40%, transparent 40%);
+    }
+
+    .highlight--purple {
+      background: linear-gradient(to top, rgba(162,144,233,0.2) 40%, transparent 40%);
+    }
+
+    /* Methodology */
+    .card--muted {
+      background: #fffdf5;
+      box-shadow: none;
+      border: 1px solid var(--gray-300);
+    }
+
+    .card--muted p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (min-width: 768px) {
+      .card { padding: 32px; }
+      .card--narrow { max-width: 560px; }
+      .hero .stat-big { font-size: 6rem; }
+    }
+
+    @media (max-width: 767px) {
+      .card { max-width: 100%; }
+      .card--narrow { max-width: 100%; }
+      .profile-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Loading state */
+    .loading {
+      text-align: center;
+      padding: 32px;
+      font-family: var(--sans);
+      color: var(--text-muted);
+    }
+
+    /* Destinations list */
+    .dest-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0;
+    }
+
+    .dest-pill {
+      font-family: var(--sans);
+      font-size: 12px;
+      background: #f0f0f0;
+      padding: 4px 10px;
+      border-radius: 10px;
+    }
+
+    /* Pull quote */
+    .pull-quote {
+      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+      font-style: italic;
+      color: var(--text);
+      text-align: center;
+      padding: 8px 0;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO: fits in one screen -->
+  <section class="hero">
+    <p class="stat-big" aria-label="67 percent">67%</p>
+    <p class="stat-label">of global chart-weeks belong to foreign artists</p>
+    <h1>Music Connects Us<br>More Than We Think</h1>
+    <p class="subtitle">Every week, billions of people press play on songs from countries they may never visit. We looked at 9 years of Spotify charts across 70 nations to see just how connected we really are.</p>
+    <p class="scroll-hint">Scroll to explore ↓</p>
+  </section>
+
+  <!-- CARDS -->
+  <main class="cards" id="cards">
+
+    <!-- ========== SECTION 1: THE SONG ========== -->
+    <div class="card card--border-left-blue">
+      <h2>The Song That Went Everywhere</h2>
+      <p>Let's start with one song. <span class="highlight">Blinding Lights</span> by The Weeknd didn't just top charts in Canada. It showed up in <strong>67 countries</strong>, racking up over 7,000 chart-weeks outside its home market. One artist, one melody, connecting the entire planet.</p>
+    </div>
+
+    <div class="card card--embed card--narrow">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/0VjIjW4GlUZAMYd2vXMi3b?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+
+    <div class="card">
+      <h3>Every year, one song travels further than all the rest</h3>
+      <p>Here are the songs with the most foreign chart-weeks each year. Notice how they come from all over:</p>
+      <div id="songs-table" class="loading">Loading data...</div>
+    </div>
+
+    <div class="card card--embed card--narrow">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/7qiZfU4dY1lWllzX7mPBI3?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+
+    <div class="card card--embed card--narrow">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/1rgnBhdG2JDFTbYkYRZAku?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+
+    <!-- ========== SECTION 2: THE ARTIST ========== -->
+    <div class="card card--border-left">
+      <h2>The Artist Who Owned the Decade</h2>
+      <p>While English-language songs spread widest, one artist rewrote the rules. <span class="highlight--orange">Bad Bunny</span> from Puerto Rico dominated 5 out of 10 years as the most-charted foreign artist. Latin artists held the #1 spot in 8 out of 10 years. That's not a fluke. That's a revolution.</p>
+    </div>
+
+    <div class="card">
+      <h3>Yearly #1 most-charted foreign artist</h3>
+      <p>Latin artists (shown in orange) dominated this list year after year:</p>
+      <div id="artists-table" class="loading">Loading data...</div>
+    </div>
+
+    <div class="card card--embed card--narrow">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/4MzXwWMhyBbmu6hOcLVD49?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:8px; font-family:var(--sans);">DAKITI - Bad Bunny & Jhay Cortez</p>
+    </div>
+
+    <div class="card card--embed card--narrow">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/1IHWl5LamUGT3TwnHxBkN8?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:8px; font-family:var(--sans);">Titi Me Pregunto - Bad Bunny</p>
+    </div>
+
+    <!-- ========== SECTION 3: THE PARADOX ========== -->
+    <div class="card card--border-left-purple">
+      <h2>The Paradox: Two Ways to Go Global</h2>
+      <p>Here's something wonderful: English and Latin music connect the world in completely different ways.</p>
+      <p><span class="highlight">English-language songs spread widest</span> - they show up in the most countries simultaneously. Think of it as broadcasting to everywhere at once.</p>
+      <p><span class="highlight--orange">Latin songs last longest</span> - once they land on a chart, they stay for weeks and weeks. Their median longevity is 30 weeks, compared to just 11 for English tracks.</p>
+      <p>Two strategies, both connecting millions of listeners across borders. There's no single recipe for global music. There's room for everyone.</p>
+    </div>
+
+    <div class="card card--narrow" style="text-align:center;">
+      <div style="display:flex; justify-content:space-around; flex-wrap:wrap; gap:16px; margin:8px 0;">
+        <div>
+          <p style="font-family:var(--sans); font-size:12px; text-transform:uppercase; color:var(--text-muted); font-weight:600;">English spread</p>
+          <p style="font-family:var(--sans); font-size:2.5rem; font-weight:800; color:var(--heartache);">58</p>
+          <p style="font-family:var(--sans); font-size:13px; color:var(--text-muted);">countries (median)</p>
+        </div>
+        <div>
+          <p style="font-family:var(--sans); font-size:12px; text-transform:uppercase; color:var(--text-muted); font-weight:600;">Latin longevity</p>
+          <p style="font-family:var(--sans); font-size:2.5rem; font-weight:800; color:var(--confidence);">30w</p>
+          <p style="font-family:var(--sans); font-size:13px; color:var(--text-muted);">median chart stay</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card--embed card--narrow">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/6habFhsOp2NvshLv26DqMb?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:8px; font-family:var(--sans);">Despacito - a song that used both strategies</p>
+    </div>
+
+    <!-- ========== SECTION 4: THE GROUPS ========== -->
+    <div class="card card--border-left-green">
+      <h2>Every Country Plays a Role</h2>
+      <p>We found that countries fall into fascinating archetypes based on how they share and receive music:</p>
+    </div>
+
+    <div class="card">
+      <h3>🌍 Global Broadcasters</h3>
+      <h4>US, UK, Canada, Australia</h4>
+      <p>These nations export music everywhere. The US alone sent songs to <strong>65+ countries</strong> every single year. Their music is the shared soundtrack of the world. But here's the beautiful twist: they import plenty too. The US chart is 27% foreign.</p>
+    </div>
+
+    <div class="card">
+      <h3>🏠 Self-Sufficient Scenes</h3>
+      <h4>Japan, South Korea, Turkey</h4>
+      <p>These countries have thriving local music cultures. Japan's chart is over 80% homegrown. South Korea exports massively (K-pop!) while keeping its domestic charts mostly local. They prove you can be globally influential AND locally rooted.</p>
+    </div>
+
+    <div class="card">
+      <h3>🌉 Regional Bridges</h3>
+      <h4>Colombia, Mexico, Sweden</h4>
+      <p>Colombia doesn't try to reach every country. Instead, it dominates Latin America with extraordinary intensity. Swedish producers punch way above their weight, bridging Nordic and global pop. These bridge nations connect their regions to the wider world.</p>
+    </div>
+
+    <div class="card card--embed card--narrow">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/0fea68AdmYNygeTGI4RC18?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:8px; font-family:var(--sans);">LA CANCION - Bad Bunny & J Balvin (Colombia + Puerto Rico)</p>
+    </div>
+
+    <!-- ========== SECTION 5: THE LATIN SECRET ========== -->
+    <div class="card card--border-left">
+      <h2>The Latin Secret Sauce</h2>
+      <p>Why did Latin music explode onto the global stage? We found three ingredients that set it apart:</p>
+    </div>
+
+    <div class="card">
+      <h4>1. Collaboration Culture</h4>
+      <p>Latin artists collaborate at a staggering rate. <span class="highlight--orange">72% of charting Latin songs are collaborations</span>, compared to roughly 40% for English-language tracks. Every collab introduces Artist A's fans to Artist B, multiplying reach exponentially. It's community over competition.</p>
+    </div>
+
+    <div class="card">
+      <h4>2. Extraordinary Longevity</h4>
+      <p>Once a Latin song charts, it <em>stays</em>. The median Latin track holds its chart position for <strong>30 weeks</strong>. English tracks average 11. This stickiness compounds over time, building massive cumulative chart-weeks even when spread across fewer countries.</p>
+    </div>
+
+    <div class="card">
+      <h4>3. Concentrated Star Power</h4>
+      <p>Latin music concentrates around superstars who become cultural icons. Bad Bunny alone accounts for a huge share of Puerto Rico's exports. This concentration creates a gravitational pull: fans follow the artist into the entire genre.</p>
+    </div>
+
+    <div class="card card--embed card--narrow">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/2Fxmhks0bxGSBdJ92vM42m?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:8px; font-family:var(--sans);">bad guy - Billie Eilish (the #1 song of 2019)</p>
+    </div>
+
+    <!-- ========== SECTION 6: YOUR COUNTRY ========== -->
+    <div class="card card--border-top card--wide">
+      <h2>Now It's Your Turn</h2>
+      <p>Every one of these 70 countries has its own musical personality. Some are extroverts blasting their songs everywhere. Some are introverts with rich local scenes. Most are somewhere in between. Pick yours and see how you connect to the world:</p>
+
+      <div class="selector-wrap">
+        <select id="country-select" aria-label="Select a country">
+          <option value="">Choose a country...</option>
+        </select>
+      </div>
+
+      <div id="country-profile" style="display:none;">
+        <h3 id="profile-name" style="margin-top:16px;"></h3>
+        <div class="profile-grid" id="profile-grid"></div>
+        <div id="profile-destinations"></div>
+        <div class="chart-container" id="chart-container">
+          <svg id="time-chart"></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card--embed card--narrow">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/4Dvkj6JhhA12EX05fT7y2e?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:8px; font-family:var(--sans);">As It Was - Harry Styles (#1 song of 2023)</p>
+    </div>
+
+    <div class="card card--embed card--narrow">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/6dOtVTDdiauQNBQEDOtlAB?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:8px; font-family:var(--sans);">BIRDS OF A FEATHER - Billie Eilish (#1 song of 2024)</p>
+    </div>
+
+    <div class="card card--embed card--narrow">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/02MWAaffLxlfxAUY7c5dvx?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:8px; font-family:var(--sans);">Heat Waves - Glass Animals (#1 song of 2022)</p>
+    </div>
+
+    <!-- ========== SECTION 7: CLOSING ========== -->
+    <div class="card" style="text-align:center;">
+      <p class="pull-quote">"Every time you press play on a song from another country, you're part of this beautiful, invisible network connecting 4 billion listeners."</p>
+      <p>Your playlist is a passport. Your charts tell the story of a world that's more connected through music than through almost anything else. And that connection is growing every single year.</p>
+      <p style="font-family:var(--sans); font-weight:700; font-size:1.1rem; margin-top:24px;">We're all sharing more than we realize.</p>
+    </div>
+
+    <div class="card card--embed card--narrow">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/7qEHsqek33rTcFNT9PFqLf?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:8px; font-family:var(--sans);">Someone You Loved - Lewis Capaldi</p>
+    </div>
+
+    <!-- ========== METHODOLOGY ========== -->
+    <div class="card card--muted">
+      <h4>Methodology & Data</h4>
+      <p>This analysis uses Spotify Charts data (weekly Top 200) across 70 countries from January 2016 through June 2025. "Foreign chart-weeks" counts each week a song appears on a chart outside its artist's home country. Artist origin is determined by the country most associated with the artist's career and early catalog.</p>
+      <p>Longevity measures how many consecutive weeks a song remains on a foreign chart. Spread measures the number of distinct countries where a song charted. Collaboration rate is the percentage of charting songs with multiple credited artists.</p>
+      <p><strong>GenAI Disclosure:</strong> Data processing, statistical analysis, and narrative drafts were assisted by generative AI tools. All findings were validated against source data. Visualization code and design are original work.</p>
+      <p style="margin-top:16px; font-size:12px; color:var(--gray-300);">VizContest 2026 Entry</p>
+    </div>
+
+  </main>
+
+  <script>
+    // Utility: flag emoji from country code
+    const flagEmoji = code => String.fromCodePoint(...[...code.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+
+    // Language group lookup
+    let languageGroups = {};
+    function getLanguageGroup(code) {
+      for (const [group, codes] of Object.entries(languageGroups)) {
+        if (codes.includes(code)) return group;
+      }
+      return 'other';
+    }
+
+    function getBadgeClass(code) {
+      const group = getLanguageGroup(code);
+      if (['anglophone'].includes(group)) return 'badge--anglophone';
+      if (['spanish', 'portuguese'].includes(group)) return 'badge--spanish';
+      if (['east_asian'].includes(group)) return 'badge--east_asian';
+      if (['nordic'].includes(group)) return 'badge--nordic';
+      if (['southeast_asian'].includes(group)) return 'badge--southeast_asian';
+      if (['south_asian'].includes(group)) return 'badge--south_asian';
+      return 'badge--other';
+    }
+
+    // Artist origin map (manual for yearly_top_artist which lacks origin)
+    const artistOrigins = {
+      'Justin Bieber': 'ca',
+      'Ed Sheeran': 'gb',
+      'Ozuna': 'pr',
+      'Anuel AA': 'pr',
+      'Bad Bunny': 'pr',
+      'Feid': 'co'
+    };
+
+    // Format numbers with commas
+    function fmt(n) {
+      if (n == null) return '-';
+      return n.toLocaleString('en-US');
+    }
+
+    // ===== DATA LOADING =====
+    let championsData, profilesData, economyData;
+
+    async function loadData() {
+      const [champ, prof, econ] = await Promise.all([
+        fetch('yearly_champions.json').then(r => r.json()),
+        fetch('country_profiles.json').then(r => r.json()),
+        fetch('music_economy.json').then(r => r.json())
+      ]);
+      championsData = champ;
+      profilesData = prof;
+      economyData = econ;
+      languageGroups = prof.language_groups || {};
+      render();
+    }
+
+    function render() {
+      renderSongsTable();
+      renderArtistsTable();
+      populateCountrySelect();
+    }
+
+    // ===== SONGS TABLE =====
+    function renderSongsTable() {
+      const container = document.getElementById('songs-table');
+      const songs = championsData.yearly_top_song;
+      let html = `<table class="data-table">
+        <thead><tr><th>Year</th><th>Song</th><th>Artist</th><th>Origin</th><th class="num">Countries</th></tr></thead>
+        <tbody>`;
+      songs.forEach(s => {
+        const badge = `<span class="badge ${getBadgeClass(s.origin)}">${flagEmoji(s.origin)} ${s.origin.toUpperCase()}</span>`;
+        const artist = s.artist.split('|')[0];
+        html += `<tr>
+          <td>${s.year}</td>
+          <td style="font-weight:500;">${s.name}</td>
+          <td>${artist}</td>
+          <td>${badge}</td>
+          <td class="num">${s.countries}</td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    // ===== ARTISTS TABLE =====
+    function renderArtistsTable() {
+      const container = document.getElementById('artists-table');
+      const artists = championsData.yearly_top_artist;
+      let html = `<table class="data-table">
+        <thead><tr><th>Year</th><th>Artist</th><th>Origin</th><th class="num">Foreign Weeks</th></tr></thead>
+        <tbody>`;
+      artists.forEach(a => {
+        const origin = artistOrigins[a.artist] || 'us';
+        const badge = `<span class="badge ${getBadgeClass(origin)}">${flagEmoji(origin)} ${origin.toUpperCase()}</span>`;
+        html += `<tr>
+          <td>${a.year}</td>
+          <td style="font-weight:500;">${a.artist}</td>
+          <td>${badge}</td>
+          <td class="num">${fmt(a.foreign_weeks)}</td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    // ===== COUNTRY SELECTOR =====
+    function populateCountrySelect() {
+      const select = document.getElementById('country-select');
+      const countries = profilesData.countries
+        .filter(c => c.has_chart)
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      countries.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.code;
+        opt.textContent = `${flagEmoji(c.code)} ${c.name}`;
+        select.appendChild(opt);
+      });
+
+      select.addEventListener('change', () => {
+        if (select.value) showCountryProfile(select.value);
+        else document.getElementById('country-profile').style.display = 'none';
+      });
+    }
+
+    function showCountryProfile(code) {
+      const panel = document.getElementById('country-profile');
+      panel.style.display = 'block';
+
+      const country = profilesData.countries.find(c => c.code === code);
+      if (!country) return;
+
+      // Name + flag
+      document.getElementById('profile-name').textContent = `${flagEmoji(code)} ${country.name}`;
+
+      // Stats grid
+      const grid = document.getElementById('profile-grid');
+      const stats = [
+        { label: 'Export Weeks', value: fmt(country.export_weeks) },
+        { label: 'Local %', value: country.pct_local != null ? country.pct_local.toFixed(1) + '%' : '-' },
+        { label: 'Longevity (median)', value: country.longevity_p50 != null ? country.longevity_p50 + 'w' : '-' },
+        { label: 'Spread (median)', value: country.spread_p50 != null ? country.spread_p50 + ' countries' : '-' },
+        { label: 'Openness', value: country.pct_open != null ? country.pct_open.toFixed(1) + '%' : '-' },
+        { label: 'Collab Rate', value: country.collab_pct != null ? country.collab_pct.toFixed(0) + '%' : '-' }
+      ];
+      grid.innerHTML = stats.map(s => `
+        <div class="profile-stat">
+          <div class="label">${s.label}</div>
+          <div class="value">${s.value}</div>
+        </div>
+      `).join('');
+
+      // Destinations
+      const destContainer = document.getElementById('profile-destinations');
+      if (country.destinations) {
+        // Try to get top destinations from economy data
+        const summary = economyData.summary[code];
+        if (summary && summary.dependency && summary.dependency.top3) {
+          const tops = summary.dependency.top3;
+          destContainer.innerHTML = `
+            <h4 style="margin-top:16px;">Top Destinations</h4>
+            <div class="dest-list">
+              ${tops.map(d => `<span class="dest-pill">${flagEmoji(d.code)} ${d.name} (${d.pct}%)</span>`).join('')}
+            </div>
+          `;
+        } else {
+          destContainer.innerHTML = `<p style="font-size:13px; color:var(--text-muted); margin-top:12px;">Exports reach ${country.destinations} countries</p>`;
+        }
+      } else {
+        destContainer.innerHTML = '';
+      }
+
+      // D3 time series chart
+      renderTimeChart(code);
+    }
+
+    function renderTimeChart(code) {
+      const container = document.getElementById('chart-container');
+      const svg = d3.select('#time-chart');
+      svg.selectAll('*').remove();
+
+      const ts = economyData.time_series[code];
+      if (!ts || ts.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+      container.style.display = 'block';
+
+      const data = ts.map(d => ({
+        year: d.year,
+        value: d.reach ? d.reach.export_weeks : 0
+      })).filter(d => d.value != null);
+
+      if (data.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+
+      const rect = container.getBoundingClientRect();
+      const width = rect.width || 600;
+      const height = 200;
+      const margin = { top: 16, right: 16, bottom: 32, left: 48 };
+      const innerW = width - margin.left - margin.right;
+      const innerH = height - margin.top - margin.bottom;
+
+      svg.attr('viewBox', `0 0 ${width} ${height}`);
+
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+      const x = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.year))
+        .range([0, innerW]);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.value) * 1.1])
+        .range([innerH, 0]);
+
+      // Area
+      const area = d3.area()
+        .x(d => x(d.year))
+        .y0(innerH)
+        .y1(d => y(d.value))
+        .curve(d3.curveMonotoneX);
+
+      g.append('path')
+        .datum(data)
+        .attr('class', 'area')
+        .attr('d', area);
+
+      // Line
+      const line = d3.line()
+        .x(d => x(d.year))
+        .y(d => y(d.value))
+        .curve(d3.curveMonotoneX);
+
+      g.append('path')
+        .datum(data)
+        .attr('class', 'line')
+        .attr('d', line);
+
+      // Dots
+      g.selectAll('.dot')
+        .data(data)
+        .join('circle')
+        .attr('class', 'dot')
+        .attr('cx', d => x(d.year))
+        .attr('cy', d => y(d.value))
+        .attr('r', 3.5);
+
+      // X axis
+      g.append('g')
+        .attr('class', 'axis')
+        .attr('transform', `translate(0,${innerH})`)
+        .call(d3.axisBottom(x).ticks(data.length).tickFormat(d3.format('d')))
+        .select('.domain').remove();
+
+      // Y axis
+      g.append('g')
+        .attr('class', 'axis')
+        .call(d3.axisLeft(y).ticks(4).tickFormat(d => d >= 1000 ? (d/1000).toFixed(0) + 'k' : d))
+        .select('.domain').remove();
+
+      // Label
+      g.append('text')
+        .attr('x', 0)
+        .attr('y', -6)
+        .attr('font-family', 'var(--sans)')
+        .attr('font-size', '11px')
+        .attr('fill', 'var(--text-muted)')
+        .text('Export chart-weeks per year');
+    }
+
+    // ===== INTERSECTION OBSERVER =====
+    function setupObserver() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      document.querySelectorAll('.card').forEach(card => {
+        observer.observe(card);
+      });
+    }
+
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      setupObserver();
+    });
+  </script>
+</body>
+</html>
