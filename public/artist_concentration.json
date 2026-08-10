@@ -1,0 +1,222 @@
+[
+  {
+    "code": "us",
+    "name": "United States",
+    "total_weeks": 1073169,
+    "n_artists": 1314,
+    "top1_pct": 2.8,
+    "top5_pct": 11.0,
+    "top10_pct": 17.6,
+    "top20_pct": 28.4,
+    "top_artist": "billie eilish"
+  },
+  {
+    "code": "pr",
+    "name": "Puerto Rico",
+    "total_weeks": 463379,
+    "n_artists": 113,
+    "top1_pct": 22.9,
+    "top5_pct": 46.2,
+    "top10_pct": 62.2,
+    "top20_pct": 79.2,
+    "top_artist": "bad bunny"
+  },
+  {
+    "code": "gb",
+    "name": "UK",
+    "total_weeks": 306815,
+    "n_artists": 498,
+    "top1_pct": 9.9,
+    "top5_pct": 30.1,
+    "top10_pct": 41.3,
+    "top20_pct": 55.9,
+    "top_artist": "ed sheeran"
+  },
+  {
+    "code": "co",
+    "name": "Colombia",
+    "total_weeks": 181605,
+    "n_artists": 128,
+    "top1_pct": 13.6,
+    "top5_pct": 53.5,
+    "top10_pct": 79.2,
+    "top20_pct": 92.2,
+    "top_artist": "karol g"
+  },
+  {
+    "code": "ca",
+    "name": "Canada",
+    "total_weeks": 115152,
+    "n_artists": 99,
+    "top1_pct": 28.7,
+    "top5_pct": 77.1,
+    "top10_pct": 86.8,
+    "top20_pct": 94.7,
+    "top_artist": "the weeknd"
+  },
+  {
+    "code": "mx",
+    "name": "Mexico",
+    "total_weeks": 73059,
+    "n_artists": 187,
+    "top1_pct": 9.6,
+    "top5_pct": 36.0,
+    "top10_pct": 50.9,
+    "top20_pct": 68.3,
+    "top_artist": "fuerza regida"
+  },
+  {
+    "code": "kr",
+    "name": "South Korea",
+    "total_weeks": 71283,
+    "n_artists": 192,
+    "top1_pct": 21.4,
+    "top5_pct": 51.2,
+    "top10_pct": 69.2,
+    "top20_pct": 83.0,
+    "top_artist": "bts"
+  },
+  {
+    "code": "ar",
+    "name": "Argentina",
+    "total_weeks": 61891,
+    "n_artists": 202,
+    "top1_pct": 12.0,
+    "top5_pct": 39.9,
+    "top10_pct": 61.7,
+    "top20_pct": 79.3,
+    "top_artist": "bizarrap"
+  },
+  {
+    "code": "de",
+    "name": "Germany",
+    "total_weeks": 59044,
+    "n_artists": 607,
+    "top1_pct": 7.2,
+    "top5_pct": 23.3,
+    "top10_pct": 32.8,
+    "top20_pct": 46.3,
+    "top_artist": "zedd"
+  },
+  {
+    "code": "fr",
+    "name": "France",
+    "total_weeks": 51840,
+    "n_artists": 310,
+    "top1_pct": 17.7,
+    "top5_pct": 42.8,
+    "top10_pct": 54.9,
+    "top20_pct": 67.4,
+    "top_artist": "david guetta"
+  },
+  {
+    "code": "au",
+    "name": "Australia",
+    "total_weeks": 45105,
+    "n_artists": 109,
+    "top1_pct": 16.0,
+    "top5_pct": 52.9,
+    "top10_pct": 73.2,
+    "top20_pct": 89.9,
+    "top_artist": "the kid laroi"
+  },
+  {
+    "code": "es",
+    "name": "Spain",
+    "total_weeks": 39224,
+    "n_artists": 126,
+    "top1_pct": 11.5,
+    "top5_pct": 38.2,
+    "top10_pct": 54.8,
+    "top20_pct": 71.4,
+    "top_artist": "rosal\u00eda"
+  },
+  {
+    "code": "br",
+    "name": "Brazil",
+    "total_weeks": 30142,
+    "n_artists": 513,
+    "top1_pct": 7.0,
+    "top5_pct": 18.0,
+    "top10_pct": 26.9,
+    "top20_pct": 39.1,
+    "top_artist": "anitta"
+  },
+  {
+    "code": "in",
+    "name": "India",
+    "total_weeks": 27662,
+    "n_artists": 370,
+    "top1_pct": 6.0,
+    "top5_pct": 24.7,
+    "top10_pct": 37.1,
+    "top20_pct": 51.4,
+    "top_artist": "shubh"
+  },
+  {
+    "code": "se",
+    "name": "Sweden",
+    "total_weeks": 26440,
+    "n_artists": 170,
+    "top1_pct": 16.3,
+    "top5_pct": 49.2,
+    "top10_pct": 69.3,
+    "top20_pct": 84.8,
+    "top_artist": "avicii"
+  },
+  {
+    "code": "nl",
+    "name": "Netherlands",
+    "total_weeks": 25589,
+    "n_artists": 167,
+    "top1_pct": 24.7,
+    "top5_pct": 68.4,
+    "top10_pct": 77.3,
+    "top20_pct": 86.3,
+    "top_artist": "ti\u00ebsto"
+  },
+  {
+    "code": "ru",
+    "name": "Russia",
+    "total_weeks": 24389,
+    "n_artists": 255,
+    "top1_pct": 4.9,
+    "top5_pct": 18.9,
+    "top10_pct": 31.6,
+    "top20_pct": 46.3,
+    "top_artist": "morgenshtern"
+  },
+  {
+    "code": "no",
+    "name": "Norway",
+    "total_weeks": 20269,
+    "n_artists": 110,
+    "top1_pct": 39.5,
+    "top5_pct": 76.3,
+    "top10_pct": 86.1,
+    "top20_pct": 92.6,
+    "top_artist": "kygo"
+  },
+  {
+    "code": "jp",
+    "name": "Japan",
+    "total_weeks": 18730,
+    "n_artists": 93,
+    "top1_pct": 18.7,
+    "top5_pct": 50.5,
+    "top10_pct": 65.7,
+    "top20_pct": 82.5,
+    "top_artist": "jin"
+  },
+  {
+    "code": "it",
+    "name": "Italy",
+    "total_weeks": 18241,
+    "n_artists": 114,
+    "top1_pct": 28.4,
+    "top5_pct": 63.2,
+    "top10_pct": 77.1,
+    "top20_pct": 88.6,
+    "top_artist": "m\u00e5neskin"
+  }
+]
