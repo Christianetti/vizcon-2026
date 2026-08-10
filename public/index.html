@@ -54,6 +54,27 @@ body {
   justify-content: center;
   text-align: center;
   overflow: hidden;
+  transition: background 1500ms ease;
+}
+
+.hero--night {
+  background: #1a1a2e;
+}
+
+.hero--night .hero__content h1 {
+  color: #f0f0f0;
+}
+
+.hero--night .hero__content h2 {
+  color: #a0a0a0;
+}
+
+.hero--night .hero__description {
+  color: #888;
+}
+
+.hero--night .hero__song-info {
+  color: #888;
 }
 
 .hero__map {
@@ -241,6 +262,9 @@ async function renderHeroMap() {
     UY:[-56,-33],VE:[-66,7],VN:[108,16],ZA:[24,-29]
   };
 
+  // Scale factor: smaller bubbles on mobile
+  const bubbleScale = width < 500 ? 0.4 : width < 900 ? 0.65 : 1;
+
   // Draw floating bubbles
   const bubbles = svg.append('g')
     .selectAll('circle')
@@ -256,11 +280,12 @@ async function renderHeroMap() {
       const coords = countryCoords[d];
       return coords ? projection(coords)[1] : 0;
     })
-    .attr('r', d => 6 + Math.random() * 8);
+    .attr('r', d => (6 + Math.random() * 8) * bubbleScale);
 
-  // 10 random bubbles pulse simultaneously with connecting arrows
+  // Randomized bubbles + arrows simulating music trade
   const nodes = bubbles.nodes();
   const arrowGroup = svg.append('g').attr('class', 'arrows');
+  const mapPaths = svg.selectAll('path');
 
   // Get projected coordinates for each country
   const projectedCoords = {};
@@ -271,6 +296,9 @@ async function renderHeroMap() {
       projectedCoords[code] = { x: p[0], y: p[1] };
     }
   });
+
+  // Random factor: returns value between 10% and 100% of base
+  function rFactor() { return 0.1 + Math.random() * 0.9; }
 
   function pulseRandom() {
     const pickIndices = [];
@@ -283,20 +311,23 @@ async function renderHeroMap() {
       const sourceCode = CHART_COUNTRIES[idx];
       const source = projectedCoords[sourceCode];
 
-      // Pulse the bubble
+      const inflateDur = 360 * rFactor();
+      const deflateDur = 180 * rFactor();
+      const maxR = 90 * rFactor() * bubbleScale;
+
       d3.select(node)
         .transition()
-        .duration(360)
+        .duration(inflateDur)
         .ease(d3.easeCubicOut)
-        .attr('r', 90)
-        .attr('opacity', 0.85)
+        .attr('r', maxR)
+        .attr('opacity', 0.5 + Math.random() * 0.4)
         .transition()
-        .duration(180)
+        .duration(deflateDur)
         .ease(d3.easeCubicIn)
         .attr('r', 4)
         .attr('opacity', 0.2);
 
-      // Draw 1-10 arrows to random destinations
+      // 1-10 arrows to random destinations
       const numArrows = 1 + Math.floor(Math.random() * 10);
       for (let a = 0; a < numArrows; a++) {
         const destIdx = Math.floor(Math.random() * CHART_COUNTRIES.length);
@@ -305,31 +336,57 @@ async function renderHeroMap() {
         const dest = projectedCoords[destCode];
         if (!source || !dest) continue;
 
+        const travelDur = 360 * rFactor();
+
         const line = arrowGroup.append('line')
           .attr('x1', source.x)
           .attr('y1', source.y)
           .attr('x2', source.x)
           .attr('y2', source.y)
-          .attr('stroke', 'var(--highlight)')
-          .attr('stroke-width', 1.5)
-          .attr('opacity', 0.7);
+          .attr('stroke', isNight ? '#7fbfdf' : 'var(--highlight)')
+          .attr('stroke-width', 1 + Math.random() * 1.5)
+          .attr('opacity', 0.4 + Math.random() * 0.4);
 
         line.transition()
-          .duration(360)
+          .duration(travelDur)
           .ease(d3.easeLinear)
           .attr('x2', dest.x)
           .attr('y2', dest.y)
           .transition()
-          .duration(100)
+          .duration(150)
           .attr('opacity', 0)
           .remove();
       }
     });
 
-    setTimeout(pulseRandom, 480);
+    const nextPulse = 480 * rFactor();
+    setTimeout(pulseRandom, nextPulse);
   }
 
   pulseRandom();
+
+  // Day/night cycle: transition every 3 seconds
+  let isNight = false;
+  const heroEl = document.getElementById('hero');
+
+  function toggleDayNight() {
+    isNight = !isNight;
+    if (isNight) {
+      heroEl.classList.add('hero--night');
+      mapPaths.transition().duration(1500)
+        .attr('fill', '#2a2a4a')
+        .attr('stroke', '#444');
+      bubbles.style('fill', '#7fbfdf');
+    } else {
+      heroEl.classList.remove('hero--night');
+      mapPaths.transition().duration(1500)
+        .attr('fill', '#d0d0d0')
+        .attr('stroke', '#bbb');
+      bubbles.style('fill', 'var(--highlight)');
+    }
+  }
+
+  setInterval(toggleDayNight, 3000);
 }
 
 renderHeroMap();
