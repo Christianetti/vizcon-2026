@@ -297,6 +297,9 @@ async function renderHeroMap() {
     }
   });
 
+  // Day/night state (declared early so pulseRandom can read it)
+  let isNight = false;
+
   // Random factor: returns value between 10% and 100% of base
   function rFactor() { return 0.1 + Math.random() * 0.9; }
 
@@ -366,7 +369,6 @@ async function renderHeroMap() {
   pulseRandom();
 
   // Day/night cycle: transition every 3 seconds
-  let isNight = false;
   const heroEl = document.getElementById('hero');
 
   function toggleDayNight() {
