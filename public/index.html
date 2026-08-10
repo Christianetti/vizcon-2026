@@ -6,7 +6,7 @@
   <title>The Music Trade Economy | VizCon 2026</title>
   <meta name="description" content="A scrollytelling visualization exploring how music travels across 70 countries. VizContest 2026 entry.">
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://unpkg.com/scrollama@3.2.0/scrollama.min.js"></script>
+  <script src="https://unpkg.com/scrollama@3.2.0/build/scrollama.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
   <style>
@@ -1308,39 +1308,42 @@ function generateNarrative(profile, code) {
   return narrative;
 }
 
-// ===== SCROLLAMA =====
+// ===== SCROLL ACTIVATION =====
 function initScrollama() {
-  const scroller = scrollama();
+  // Use IntersectionObserver for reliable scroll-triggered animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        el.classList.add('is-active');
 
-  scroller
-    .setup({
-      step: '.scroll-content',
-      offset: 0.6,
-      once: false,
-    })
-    .onStepEnter(response => {
-      response.element.classList.add('is-active');
+        const id = el.id;
 
-      // Trigger specific animations
-      const id = response.element.id;
+        if (id === 'content-imports') {
+          setTimeout(() => {
+            document.querySelector('.stat-bar-imported').style.width = '67%';
+            document.querySelector('.stat-bar-local').style.width = '33%';
+          }, 300);
+        }
 
-      if (id === 'content-imports') {
-        setTimeout(() => {
-          document.querySelector('.stat-bar-imported').style.width = '67%';
-          document.querySelector('.stat-bar-local').style.width = '33%';
-        }, 300);
-      }
+        if (id === 'content-song-reveal') {
+          triggerReveal(['suspense-1', 'suspense-2', 'suspense-3', 'song-reveal', 'song-stat'], 400);
+        }
 
-      if (id === 'content-song-reveal') {
-        triggerReveal(['suspense-1', 'suspense-2', 'suspense-3', 'song-reveal', 'song-stat'], 400);
-      }
+        if (id === 'content-artist-reveal') {
+          triggerReveal(['artist-suspense-1', 'artist-suspense-2', 'artist-suspense-3', 'artist-reveal', 'artist-stat'], 400);
+        }
 
-      if (id === 'content-artist-reveal') {
-        triggerReveal(['artist-suspense-1', 'artist-suspense-2', 'artist-suspense-3', 'artist-reveal', 'artist-stat'], 400);
+        observer.unobserve(el);
       }
     });
+  }, { threshold: 0.2 });
 
-  // Make methodology always visible
+  document.querySelectorAll('.scroll-content').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Make methodology and country selector always visible
   document.getElementById('content-methodology').classList.add('is-active');
   document.getElementById('content-your-country').classList.add('is-active');
 }
