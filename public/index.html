@@ -258,16 +258,32 @@ async function renderHeroMap() {
     })
     .attr('r', d => 6 + Math.random() * 8);
 
-  // 10 random bubbles pulse simultaneously, continuously
+  // 10 random bubbles pulse simultaneously with connecting arrows
   const nodes = bubbles.nodes();
+  const arrowGroup = svg.append('g').attr('class', 'arrows');
+
+  // Get projected coordinates for each country
+  const projectedCoords = {};
+  CHART_COUNTRIES.forEach(code => {
+    const coords = countryCoords[code];
+    if (coords) {
+      const p = projection(coords);
+      projectedCoords[code] = { x: p[0], y: p[1] };
+    }
+  });
 
   function pulseRandom() {
-    const picks = [];
+    const pickIndices = [];
     for (let i = 0; i < 10; i++) {
-      picks.push(nodes[Math.floor(Math.random() * nodes.length)]);
+      pickIndices.push(Math.floor(Math.random() * CHART_COUNTRIES.length));
     }
 
-    picks.forEach(node => {
+    pickIndices.forEach(idx => {
+      const node = nodes[idx];
+      const sourceCode = CHART_COUNTRIES[idx];
+      const source = projectedCoords[sourceCode];
+
+      // Pulse the bubble
       d3.select(node)
         .transition()
         .duration(360)
@@ -279,9 +295,38 @@ async function renderHeroMap() {
         .ease(d3.easeCubicIn)
         .attr('r', 4)
         .attr('opacity', 0.2);
+
+      // Draw 1-10 arrows to random destinations
+      const numArrows = 1 + Math.floor(Math.random() * 10);
+      for (let a = 0; a < numArrows; a++) {
+        const destIdx = Math.floor(Math.random() * CHART_COUNTRIES.length);
+        if (destIdx === idx) continue;
+        const destCode = CHART_COUNTRIES[destIdx];
+        const dest = projectedCoords[destCode];
+        if (!source || !dest) continue;
+
+        const line = arrowGroup.append('line')
+          .attr('x1', source.x)
+          .attr('y1', source.y)
+          .attr('x2', source.x)
+          .attr('y2', source.y)
+          .attr('stroke', 'var(--highlight)')
+          .attr('stroke-width', 1.5)
+          .attr('opacity', 0.7);
+
+        line.transition()
+          .duration(360)
+          .ease(d3.easeLinear)
+          .attr('x2', dest.x)
+          .attr('y2', dest.y)
+          .transition()
+          .duration(100)
+          .attr('opacity', 0)
+          .remove();
+      }
     });
 
-    setTimeout(pulseRandom, 180);
+    setTimeout(pulseRandom, 480);
   }
 
   pulseRandom();
