@@ -1,0 +1,166 @@
+{
+  "yearly_top_song": [
+    {
+      "year": 2016,
+      "uri": "spotify:track:5aAx2yezTd8zXrkmtKl66Z",
+      "track_id": "5aAx2yezTd8zXrkmtKl66Z",
+      "name": "Starboy",
+      "artist": "The Weeknd|Daft Punk",
+      "origin": "ca",
+      "foreign_weeks": 54,
+      "countries": 54,
+      "foreign_streams": 2994372
+    },
+    {
+      "year": 2017,
+      "uri": "spotify:track:7qiZfU4dY1lWllzX7mPBI3",
+      "track_id": "7qiZfU4dY1lWllzX7mPBI3",
+      "name": "Shape of You",
+      "artist": "Ed Sheeran",
+      "origin": "gb",
+      "foreign_weeks": 2813,
+      "countries": 55,
+      "foreign_streams": 1366899589
+    },
+    {
+      "year": 2018,
+      "uri": "spotify:track:7qiZfU4dY1lWllzX7mPBI3",
+      "track_id": "7qiZfU4dY1lWllzX7mPBI3",
+      "name": "Shape of You",
+      "artist": "Ed Sheeran",
+      "origin": "gb",
+      "foreign_weeks": 2116,
+      "countries": 58,
+      "foreign_streams": 313768425
+    },
+    {
+      "year": 2019,
+      "uri": "spotify:track:2Fxmhks0bxGSBdJ92vM42m",
+      "track_id": "2Fxmhks0bxGSBdJ92vM42m",
+      "name": "bad guy",
+      "artist": "Billie Eilish",
+      "origin": "us",
+      "foreign_weeks": 2291,
+      "countries": 63,
+      "foreign_streams": 752926539
+    },
+    {
+      "year": 2020,
+      "uri": "spotify:track:1rgnBhdG2JDFTbYkYRZAku",
+      "track_id": "1rgnBhdG2JDFTbYkYRZAku",
+      "name": "Dance Monkey",
+      "artist": "Tones And I",
+      "origin": "au",
+      "foreign_weeks": 2859,
+      "countries": 64,
+      "foreign_streams": 1077754967
+    },
+    {
+      "year": 2021,
+      "uri": "spotify:track:0VjIjW4GlUZAMYd2vXMi3b",
+      "track_id": "0VjIjW4GlUZAMYd2vXMi3b",
+      "name": "Blinding Lights",
+      "artist": "The Weeknd",
+      "origin": "ca",
+      "foreign_weeks": 2609,
+      "countries": 63,
+      "foreign_streams": 712428142
+    },
+    {
+      "year": 2022,
+      "uri": "spotify:track:02MWAaffLxlfxAUY7c5dvx",
+      "track_id": "02MWAaffLxlfxAUY7c5dvx",
+      "name": "Heat Waves",
+      "artist": "Glass Animals",
+      "origin": "gb",
+      "foreign_weeks": 2191,
+      "countries": 55,
+      "foreign_streams": 883330455
+    },
+    {
+      "year": 2023,
+      "uri": "spotify:track:4Dvkj6JhhA12EX05fT7y2e",
+      "track_id": "4Dvkj6JhhA12EX05fT7y2e",
+      "name": "As It Was",
+      "artist": "Harry Styles",
+      "origin": "gb",
+      "foreign_weeks": 2165,
+      "countries": 64,
+      "foreign_streams": 748761665
+    },
+    {
+      "year": 2024,
+      "uri": "spotify:track:6dOtVTDdiauQNBQEDOtlAB",
+      "track_id": "6dOtVTDdiauQNBQEDOtlAB",
+      "name": "BIRDS OF A FEATHER",
+      "artist": "Billie Eilish",
+      "origin": "us",
+      "foreign_weeks": 1920,
+      "countries": 65,
+      "foreign_streams": 1181127650
+    },
+    {
+      "year": 2025,
+      "uri": "spotify:track:6dOtVTDdiauQNBQEDOtlAB",
+      "track_id": "6dOtVTDdiauQNBQEDOtlAB",
+      "name": "BIRDS OF A FEATHER",
+      "artist": "Billie Eilish",
+      "origin": "us",
+      "foreign_weeks": 2215,
+      "countries": 66,
+      "foreign_streams": 909493804
+    }
+  ],
+  "yearly_top_artist": [
+    {
+      "year": 2016,
+      "artist": "Justin Bieber",
+      "foreign_weeks": 173
+    },
+    {
+      "year": 2017,
+      "artist": "Ed Sheeran",
+      "foreign_weeks": 11048
+    },
+    {
+      "year": 2018,
+      "artist": "Ozuna",
+      "foreign_weeks": 13420
+    },
+    {
+      "year": 2019,
+      "artist": "Anuel AA",
+      "foreign_weeks": 10240
+    },
+    {
+      "year": 2020,
+      "artist": "Bad Bunny",
+      "foreign_weeks": 15352
+    },
+    {
+      "year": 2021,
+      "artist": "Bad Bunny",
+      "foreign_weeks": 12979
+    },
+    {
+      "year": 2022,
+      "artist": "Bad Bunny",
+      "foreign_weeks": 26624
+    },
+    {
+      "year": 2023,
+      "artist": "Bad Bunny",
+      "foreign_weeks": 15634
+    },
+    {
+      "year": 2024,
+      "artist": "Feid",
+      "foreign_weeks": 7520
+    },
+    {
+      "year": 2025,
+      "artist": "Bad Bunny",
+      "foreign_weeks": 14026
+    }
+  ]
+}

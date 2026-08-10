@@ -3,167 +3,1356 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Music Trade Economy | VizCon 2026</title>
+  <title>The Music Trade Economy | VizCon 2026</title>
+  <meta name="description" content="A scrollytelling visualization exploring how music travels across 70 countries. VizContest 2026 entry.">
   <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/scrollama@3.2.0/scrollama.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', -apple-system, sans-serif; background: #0a0a0a; color: #e0e0e0; }
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --text: #e8e8ec;
+      --text-muted: #8a8a9a;
+      --accent: #1db954;
+      --accent-dim: #1a7a3a;
+      --gold: #f5c842;
+      --coral: #ff6b6b;
+      --blue: #4ecdc4;
+      --purple: #a78bfa;
+      --pink: #f472b6;
+      --orange: #fb923c;
+    }
 
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ===== SCROLLYTELLING LAYOUT ===== */
+    .scroll-section {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+    }
+
+    .scroll-content {
+      max-width: 720px;
+      width: 100%;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .scroll-content.is-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== HERO / INTRO ===== */
     .hero {
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
       padding: 2rem;
+      position: relative;
     }
-    .hero h1 { font-size: 3rem; font-weight: 700; color: #fff; margin-bottom: 1rem; }
-    .hero p { font-size: 1.3rem; color: #888; max-width: 600px; }
 
-    .section {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 4rem 2rem;
+    .owl-icon {
+      font-size: 4rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards;
     }
-    .section h2 { font-size: 2rem; margin-bottom: 1.5rem; color: #fff; }
-    .section p { font-size: 1.1rem; color: #aaa; line-height: 1.6; margin-bottom: 1rem; }
 
-    #chart-container {
-      width: 100%;
-      max-width: 900px;
-      margin: 2rem auto;
-      background: #111;
+    .hero-question {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 5vw, 3.2rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeIn 1.5s ease 0.8s forwards;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 520px;
+      opacity: 0;
+      animation: fadeIn 1.5s ease 1.5s forwards;
+    }
+
+    .hero-owl-intro {
+      margin-top: 3rem;
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      line-height: 1.8;
+      opacity: 0;
+      animation: fadeIn 1.5s ease 2.2s forwards;
+    }
+
+    .hero-owl-intro em { color: var(--text); font-style: normal; }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      opacity: 0;
+      animation: fadeIn 1s ease 3.5s forwards, bounce 2s ease 4s infinite;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-8px); }
+    }
+
+    /* ===== TYPOGRAPHY ===== */
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1.5rem;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    p strong { color: var(--text); }
+
+    .owl-voice {
+      font-style: italic;
+      color: var(--gold);
+      border-left: 3px solid var(--gold);
+      padding-left: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .big-number {
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-weight: 800;
+      color: var(--accent);
+      text-align: center;
+      margin: 2rem 0 1rem;
+    }
+
+    .big-number span {
+      font-size: 0.4em;
+      color: var(--text-muted);
+      display: block;
+      font-weight: 400;
+    }
+
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.5rem;
+      margin: 2rem 0;
+      background: rgba(29, 185, 84, 0.05);
+      border-radius: 0 8px 8px 0;
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+
+    /* ===== STAT COUNTER ===== */
+    .stat-bar {
+      display: flex;
+      height: 48px;
       border-radius: 8px;
-      padding: 2rem;
+      overflow: hidden;
+      margin: 2rem 0;
+      position: relative;
     }
 
-    .bar { fill: #4ecdc4; }
-    .bar:hover { fill: #45b7aa; }
-    .bar-label { fill: #ccc; font-size: 12px; }
-    .axis text { fill: #888; font-size: 11px; }
-    .axis line, .axis path { stroke: #333; }
+    .stat-bar-imported {
+      background: var(--coral);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #fff;
+      transition: width 1.5s ease;
+    }
 
-    .stats {
+    .stat-bar-local {
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #fff;
+      transition: width 1.5s ease;
+    }
+
+    /* ===== REVEAL ANIMATION ===== */
+    .reveal-container {
+      text-align: center;
+      padding: 3rem 0;
+    }
+
+    .reveal-suspense {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease;
+    }
+
+    .reveal-suspense.show { opacity: 1; transform: translateY(0); }
+
+    .reveal-answer {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 700;
+      color: #fff;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.8s ease;
+    }
+
+    .reveal-answer.show { opacity: 1; transform: scale(1); }
+
+    .reveal-stat {
+      font-size: 1rem;
+      color: var(--accent);
+      margin-top: 0.5rem;
+      opacity: 0;
+      transition: opacity 0.6s ease 0.3s;
+    }
+
+    .reveal-stat.show { opacity: 1; }
+
+    /* ===== TABLE ===== */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2rem 0;
+      font-size: 0.9rem;
+    }
+
+    .data-table th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid #2a2a3a;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .data-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #1a1a2a;
+      color: var(--text);
+    }
+
+    .data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .data-table .highlight td {
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .origin-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .origin-badge.anglo { background: rgba(78, 205, 196, 0.15); color: var(--blue); }
+    .origin-badge.latin { background: rgba(251, 146, 60, 0.15); color: var(--orange); }
+
+    /* ===== COMPARISON CARDS ===== */
+    .compare-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: 1fr 1fr;
       gap: 1.5rem;
       margin: 2rem 0;
     }
-    .stat-card {
-      background: #111;
-      border-radius: 8px;
+
+    @media (max-width: 640px) {
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+
+    .compare-card {
+      background: var(--bg-card);
+      border-radius: 12px;
       padding: 1.5rem;
+      border: 1px solid #2a2a3a;
+    }
+
+    .compare-card h4 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .compare-card .metric {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0.5rem 0;
+    }
+
+    .compare-card .metric-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== COUNTRY GROUP CARDS ===== */
+    .group-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      border: 1px solid #2a2a3a;
+      transition: border-color 0.3s;
+    }
+
+    .group-card:hover { border-color: #3a3a4a; }
+
+    .group-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .group-card .countries {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .country-chip {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .group-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #2a2a3a;
+    }
+
+    .group-stat-item {
       text-align: center;
     }
-    .stat-card .number { font-size: 2.5rem; font-weight: 700; color: #4ecdc4; }
-    .stat-card .label { font-size: 0.9rem; color: #888; margin-top: 0.5rem; }
 
+    .group-stat-item .value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .group-stat-item .label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* ===== INTERACTIVE COUNTRY SELECTOR ===== */
+    .country-selector {
+      text-align: center;
+      padding: 2rem 0;
+    }
+
+    .country-search {
+      width: 100%;
+      max-width: 400px;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      background: var(--bg-card);
+      border: 2px solid #3a3a4a;
+      border-radius: 50px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.3s;
+      font-family: inherit;
+    }
+
+    .country-search:focus { border-color: var(--accent); }
+    .country-search::placeholder { color: var(--text-muted); }
+
+    .country-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+
+    .country-btn {
+      padding: 0.6rem 0.8rem;
+      background: var(--bg-card);
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .country-btn:hover {
+      background: rgba(29, 185, 84, 0.1);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .country-btn.selected {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+      font-weight: 600;
+    }
+
+    /* ===== COUNTRY PROFILE ===== */
+    .country-profile {
+      display: none;
+      animation: slideUp 0.6s ease;
+    }
+
+    .country-profile.visible { display: block; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .profile-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .profile-header .flag {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .profile-header h3 {
+      font-size: 1.8rem;
+    }
+
+    .profile-header .archetype {
+      color: var(--accent);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    .profile-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .profile-metric {
+      background: var(--bg-card);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      border: 1px solid #2a2a3a;
+    }
+
+    .profile-metric .value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .profile-metric .label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+    }
+
+    #profile-chart {
+      width: 100%;
+      margin: 2rem 0;
+    }
+
+    .profile-narrative {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border-left: 3px solid var(--gold);
+      margin: 2rem 0;
+      font-style: italic;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    /* ===== METHODOLOGY ===== */
+    .methodology {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 2.5rem;
+      margin: 2rem 0;
+      border: 1px solid #2a2a3a;
+    }
+
+    .methodology h3 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .methodology h3:first-child { margin-top: 0; }
+
+    .methodology p, .methodology li {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .methodology ul {
+      list-style: none;
+      padding-left: 1rem;
+    }
+
+    .methodology li {
+      margin-bottom: 0.5rem;
+      position: relative;
+      padding-left: 1rem;
+    }
+
+    .methodology li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.6rem;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .methodology a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .methodology a:hover { text-decoration: underline; }
+
+    /* ===== FOOTER ===== */
     footer {
       text-align: center;
-      padding: 3rem;
-      color: #555;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
       font-size: 0.85rem;
+      border-top: 1px solid #1a1a2a;
+    }
+
+    footer .owl-sign { font-size: 2rem; margin-bottom: 1rem; }
+
+    /* ===== CHART STYLES ===== */
+    .chart-container {
+      width: 100%;
+      margin: 2rem 0;
+      overflow-x: auto;
+    }
+
+    .bar-chart-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.4rem;
+      height: 32px;
+    }
+
+    .bar-label {
+      width: 100px;
+      flex-shrink: 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: right;
+      padding-right: 0.75rem;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 24px;
+      background: #1a1a2a;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s ease;
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+    }
+
+    /* ===== SECTION DIVIDER ===== */
+    .section-divider {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      letter-spacing: 0.5em;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .scroll-section { padding: 3rem 1.5rem; }
+      .data-table { font-size: 0.8rem; }
+      .data-table th, .data-table td { padding: 0.5rem; }
+      .group-stats { grid-template-columns: repeat(2, 1fr); }
+      .profile-metrics { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
 
-  <section class="hero">
-    <h1>The Music Trade Economy</h1>
-    <p>Who exports music, who imports it, and what does that tell us about cultural influence?</p>
-  </section>
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="owl-icon">🦉</div>
+  <h1 class="hero-question">You think your music taste is yours.</h1>
+  <p class="hero-sub">That playlist you made at 2 a.m.? The song you played eleven times last Tuesday? The artist you found "before they were big"?</p>
+  <div class="hero-owl-intro">
+    <p>The owl has news.</p>
+    <p>She has watched <em>42.8 million</em> daily top-200 song chart entries. <em>70 countries</em>. Nine years. <em>84,985 artists</em>. And she has noticed something the listener rarely does: your taste is not as unique as you believe. It is, in large part, a product of where you live.</p>
+    <p>The owl does not say this to hurt. She says it because the data is beautiful once you see the pattern. And she will show you.</p>
+    <p style="color: var(--accent); margin-top: 1.5rem; font-weight: 500;">Welcome to the Music Trade Economy.</p>
+  </div>
+  <div class="scroll-hint">Scroll to begin ↓</div>
+</section>
 
-  <section class="section">
-    <h2>The Numbers</h2>
-    <div class="stats" id="stats"></div>
-  </section>
+<!-- ===== SECTION 1: IMPORTS ===== -->
+<section class="scroll-section" id="sec-imports">
+  <div class="scroll-content" id="content-imports">
+    <h2>The World Listens to Imports</h2>
+    <p>Think of your country's music charts as a shelf in a store. Some of the products are made locally. Most? Shipped in from somewhere else.</p>
+    <p>Globally, only <strong>33% of what people listen to comes from their own country.</strong> The rest -- two out of every three songs on your charts -- was made somewhere else, by someone who has never set foot in your city.</p>
 
-  <section class="section">
-    <h2>Top 15 Music Exporters</h2>
-    <p>Chart-days earned by a country's artists on foreign charts (2017-2025)</p>
-    <div id="chart-container">
-      <svg id="chart"></svg>
+    <div class="stat-bar" id="import-bar">
+      <div class="stat-bar-imported" style="width: 0%">67% IMPORTED</div>
+      <div class="stat-bar-local" style="width: 0%">33% LOCAL</div>
     </div>
-  </section>
 
-  <section class="section">
-    <h2>Methodology</h2>
-    <p>Source: Spotify Charts Daily (2017-2026). 42.8 million rows across 73 countries.</p>
-    <p>Artist nationality resolved from Wikipedia, Wikidata, MusicBrainz, Kaggle, and chart-distribution heuristics. 99.6% song coverage.</p>
-    <p>A song is "exported" when it charts in a country that is not the artist's home. Dual-nationality artists are considered local in both countries.</p>
-  </section>
+    <p class="owl-voice">Your "personal discovery"? It probably traveled through 15 countries before it reached your ears. The owl does not judge. She simply notes that the shelf was stocked before you walked in.</p>
+  </div>
+</section>
 
-  <footer>
-    VizCon 2026 Entry | Data: Spotify Charts Daily (public dataset) | Built with D3.js
-  </footer>
+<!-- ===== SECTION 2: THE SONG ===== -->
+<section class="scroll-section" id="sec-song-reveal">
+  <div class="scroll-content" id="content-song-reveal">
+    <div class="reveal-container">
+      <div class="reveal-suspense" id="suspense-1">If there is one song that crossed every border...</div>
+      <div class="reveal-suspense" id="suspense-2">one song that charted in 67 countries...</div>
+      <div class="reveal-suspense" id="suspense-3">one song that stayed on charts for over 7,000 weeks combined...</div>
+      <div class="reveal-answer" id="song-reveal">Blinding Lights<br><span style="font-size: 0.5em; color: var(--text-muted);">The Weeknd</span></div>
+      <div class="reveal-stat" id="song-stat">7,051 weeks on foreign charts. 67 countries. From Reykjavik to Jakarta.</div>
+    </div>
+    <p style="margin-top: 2rem;">Think about that. While you were listening to it in your bedroom thinking "this is MY song" -- 67 countries were thinking the exact same thing. Simultaneously.</p>
+    <p class="owl-voice">The owl finds this neither surprising nor sad. It is simply how music works now. The question is: who keeps sending these songs around the world?</p>
+  </div>
+</section>
 
-  <script>
-    fetch('music_economy.json')
-      .then(r => r.json())
-      .then(data => {
-        // Stats
-        const statsEl = document.getElementById('stats');
-        const meta = data.meta;
-        const countries = Object.values(data.summary);
-        const totalExports = countries.reduce((s, c) => s + c.exports, 0);
+<section class="scroll-section" id="sec-song-table">
+  <div class="scroll-content" id="content-song-table">
+    <h2>The Most-Traveled Song, Every Year</h2>
+    <table class="data-table" id="yearly-songs-table">
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Song</th>
+          <th>Artist</th>
+          <th>From</th>
+          <th>Countries</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p><strong>Nine years. All English-speaking countries. No exceptions.</strong></p>
+    <p class="owl-voice">The owl lets that sit.</p>
+  </div>
+</section>
 
-        const stats = [
-          { number: '42.8M', label: 'Chart-days analyzed' },
-          { number: meta.n_countries, label: 'Countries' },
-          { number: '9', label: 'Years (2017-2025)' },
-          { number: Math.round(totalExports / 1e6) + 'M', label: 'Export chart-days' },
-        ];
-        statsEl.innerHTML = stats.map(s =>
-          `<div class="stat-card"><div class="number">${s.number}</div><div class="label">${s.label}</div></div>`
-        ).join('');
+<!-- ===== SECTION 3: THE ARTIST ===== -->
+<section class="scroll-section" id="sec-artist-reveal">
+  <div class="scroll-content" id="content-artist-reveal">
+    <div class="reveal-container">
+      <div class="reveal-suspense" id="artist-suspense-1">But if there is one artist who owned the decade...</div>
+      <div class="reveal-suspense" id="artist-suspense-2">not by reaching the most countries at once...</div>
+      <div class="reveal-suspense" id="artist-suspense-3">but by never, ever leaving...</div>
+      <div class="reveal-answer" id="artist-reveal">Bad Bunny</div>
+      <div class="reveal-stat" id="artist-stat">126,075 weeks on foreign charts. No English-language songs. No compromise.</div>
+    </div>
+    <p style="margin-top: 2rem;">He was the #1 exported artist in 2020. And 2021. And 2022. And 2023. And 2025. Five out of nine years.</p>
+  </div>
+</section>
 
-        // Bar chart - top 15 exporters (only chart countries)
-        const chartCountries = countries
-          .filter(c => c.has_chart)
-          .sort((a, b) => b.exports - a.exports)
-          .slice(0, 15);
+<section class="scroll-section" id="sec-artist-table">
+  <div class="scroll-content" id="content-artist-table">
+    <h2>The Top Exported Artist, Every Year</h2>
+    <table class="data-table" id="yearly-artists-table">
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Artist</th>
+          <th>From</th>
+          <th>Export Weeks</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p><strong>Latin artists dominated the artist ranking 8 of 9 years.</strong></p>
+    <p>Wait. The top songs are always English. The top artists are always Latin. How?</p>
+    <p class="owl-voice">The owl will explain. It is her favorite part.</p>
+  </div>
+</section>
 
-        const margin = { top: 20, right: 80, bottom: 20, left: 120 };
-        const width = 860 - margin.left - margin.right;
-        const height = 500 - margin.top - margin.bottom;
+<!-- ===== SECTION 4: TWO STRATEGIES ===== -->
+<section class="scroll-section" id="sec-strategies">
+  <div class="scroll-content" id="content-strategies">
+    <h2>Two Ways to Conquer the World</h2>
+    <p>Imagine two restaurants.</p>
+    <p><strong>Restaurant A</strong> (the US, UK, Canada, Australia) opens a new location every week. Each one is packed for a month, then a new one opens and everyone moves there. Hundreds of locations, brief stays, maximum footprint.</p>
+    <p><strong>Restaurant B</strong> (Puerto Rico, Colombia) opens fewer locations. But people come back every single week for months. The menu does not change. It does not need to.</p>
+    <p>That is the difference between Anglophone and Latin music exports.</p>
 
-        const svg = d3.select('#chart')
-          .attr('width', width + margin.left + margin.right)
-          .attr('height', height + margin.top + margin.bottom)
-          .append('g')
-          .attr('transform', `translate(${margin.left},${margin.top})`);
+    <div class="compare-grid">
+      <div class="compare-card">
+        <h4>🇺🇸 United States</h4>
+        <div class="metric" style="color: var(--blue);">7,571</div>
+        <div class="metric-label">songs exported</div>
+        <div style="margin-top: 1rem;">
+          <div class="metric" style="color: var(--blue); font-size: 1.4rem;">11 weeks</div>
+          <div class="metric-label">median time abroad before replaced</div>
+        </div>
+      </div>
+      <div class="compare-card">
+        <h4>🇨🇴 Colombia</h4>
+        <div class="metric" style="color: var(--orange);">846</div>
+        <div class="metric-label">songs exported</div>
+        <div style="margin-top: 1rem;">
+          <div class="metric" style="color: var(--orange); font-size: 1.4rem;">30 weeks</div>
+          <div class="metric-label">median time abroad (3x longer)</div>
+        </div>
+      </div>
+    </div>
 
-        const y = d3.scaleBand()
-          .domain(chartCountries.map(d => d.name))
-          .range([0, height])
-          .padding(0.2);
+    <p>🇵🇷 <strong>Puerto Rico</strong>: 456 artists exporting. But the top one (Bad Bunny) accounts for <strong>42%</strong> of the entire country's exports. One person. Almost half the economy.</p>
 
-        const x = d3.scaleLinear()
-          .domain([0, d3.max(chartCountries, d => d.exports)])
-          .range([0, width]);
+    <blockquote>English-speaking countries win the breadth game. Latin countries win the depth game. Both strategies work. Neither yields.</blockquote>
+  </div>
+</section>
 
-        svg.selectAll('.bar')
-          .data(chartCountries)
-          .join('rect')
-          .attr('class', 'bar')
-          .attr('y', d => y(d.name))
-          .attr('width', d => x(d.exports))
-          .attr('height', y.bandwidth())
-          .attr('rx', 3);
+<!-- ===== SECTION 5: GROUPS ===== -->
+<section class="scroll-section" id="sec-groups-intro">
+  <div class="scroll-content" id="content-groups-intro">
+    <h2>The Groups</h2>
+    <p>Not all countries play the same role in this economy. The owl sorted them.</p>
+  </div>
+</section>
 
-        svg.selectAll('.bar-label')
-          .data(chartCountries)
-          .join('text')
-          .attr('class', 'bar-label')
-          .attr('x', d => x(d.exports) + 8)
-          .attr('y', d => y(d.name) + y.bandwidth() / 2 + 4)
-          .text(d => (d.exports / 1e6).toFixed(1) + 'M');
+<section class="scroll-section" id="sec-anglophone">
+  <div class="scroll-content" id="content-anglophone">
+    <div class="group-card" style="border-color: var(--blue);">
+      <h3><span style="color: var(--blue);">●</span> The Anglophone Network</h3>
+      <p>These countries share music freely among themselves and export relentlessly to everyone else. An open trading bloc.</p>
+      <div class="countries" id="anglo-countries"></div>
+      <div class="group-stats">
+        <div class="group-stat-item">
+          <div class="value" style="color: var(--blue);">1.15M</div>
+          <div class="label">combined export weeks</div>
+        </div>
+        <div class="group-stat-item">
+          <div class="value" style="color: var(--blue);">68:1</div>
+          <div class="label">US export ratio</div>
+        </div>
+        <div class="group-stat-item">
+          <div class="value" style="color: var(--blue);">54%</div>
+          <div class="label">from same-year releases</div>
+        </div>
+      </div>
+      <p style="margin-top: 1rem;" class="owl-voice">Their strategy: volume and freshness. You heard that song last month? It is already being replaced. Your Discover Weekly is full of these. The owl knows.</p>
+    </div>
+  </div>
+</section>
 
-        svg.append('g')
-          .attr('class', 'axis')
-          .call(d3.axisLeft(y).tickSize(0).tickPadding(8));
-      });
-  </script>
+<section class="scroll-section" id="sec-fortresses">
+  <div class="scroll-content" id="content-fortresses">
+    <div class="group-card" style="border-color: var(--coral);">
+      <h3><span style="color: var(--coral);">●</span> The Cultural Fortresses</h3>
+      <p>Some countries looked at the global music flood and said: no, thank you.</p>
+      <div class="chart-container" id="fortress-chart"></div>
+      <p class="owl-voice">The owl respects a closed door that stays closed. These nations produce enough music to feed themselves. They do not need the import aisle.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scroll-section" id="sec-corridors">
+  <div class="scroll-content" id="content-corridors">
+    <div class="group-card" style="border-color: var(--purple);">
+      <h3><span style="color: var(--purple);">●</span> The Regional Corridors</h3>
+      <p>Some countries do not export globally. They export to their neighbors.</p>
+      <p><strong>Puerto Rico</strong> sends music to 15+ Latin American countries. Not to Finland. Not to Japan. The corridor is linguistic and cultural.</p>
+      <p><strong>South Korea</strong> dominates Southeast Asia: 23% of Thailand's imports, 28% of Vietnam's. K-pop travels on a very specific route.</p>
+      <p><strong>Turkey</strong> sends music across Central Asia and the Middle East. Not to Scandinavia.</p>
+      <p class="owl-voice">Cultural proximity matters more than Spotify's algorithm. Your neighbors shape your charts more than any recommendation engine.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 6: LATIN SECRET ===== -->
+<section class="scroll-section" id="sec-latin">
+  <div class="scroll-content" id="content-latin">
+    <h2>The Latin Secret</h2>
+    <p>The owl promised to explain why Latin artists dominate the rankings while Latin songs do not win the "most traveled" award. It comes down to three things:</p>
+
+    <div class="group-card" style="border-color: var(--orange); margin-top: 1.5rem;">
+      <h3>1. They collaborate constantly</h3>
+      <p>In the US, 40% of exported songs feature multiple artists. In Puerto Rico and Colombia? <strong>72%.</strong></p>
+      <p>When Bad Bunny features Feid, Colombia listens. When Feid features Bad Bunny, Puerto Rico listens. It compounds.</p>
+      <div class="chart-container" id="collab-chart"></div>
+    </div>
+
+    <div class="group-card" style="border-color: var(--orange);">
+      <h3>2. Their songs do not expire</h3>
+      <p>A US hit cycles out of charts in <strong>11 weeks</strong> (median). A Colombian hit stays for <strong>30</strong>. A Puerto Rican hit for <strong>26</strong>.</p>
+      <p>The songs are built to last: danceable, repeatable, tied to moments rather than trends.</p>
+    </div>
+
+    <div class="group-card" style="border-color: var(--orange);">
+      <h3>3. Fewer artists carry more weight</h3>
+      <p>The US exports through <strong>2,845</strong> different artists. Puerto Rico through <strong>456</strong> -- and Bad Bunny alone is 42% of it.</p>
+      <p>This is not a weakness. It means each artist builds a personal brand so strong that an entire country's musical identity travels on their name.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 7: YOUR COUNTRY ===== -->
+<section class="scroll-section" id="sec-your-country" style="min-height: auto; padding-top: 6rem;">
+  <div class="scroll-content" id="content-your-country" style="max-width: 800px;">
+    <h2 style="text-align: center;">But What About Your Country?</h2>
+    <p style="text-align: center;">The owl has shown you the patterns. The strategies. The blocs. Now it is your turn.</p>
+    <p style="text-align: center; color: var(--text);">Select where you are from. Or where you live. Or where you grew up listening to music.</p>
+
+    <div class="country-selector">
+      <input type="text" class="country-search" id="country-search" placeholder="Search for a country...">
+      <div class="country-grid" id="country-grid"></div>
+    </div>
+
+    <div class="country-profile" id="country-profile">
+      <div class="profile-header">
+        <div class="flag" id="profile-flag"></div>
+        <h3 id="profile-name"></h3>
+        <div class="archetype" id="profile-archetype"></div>
+      </div>
+      <div class="profile-metrics" id="profile-metrics"></div>
+      <div id="profile-chart"></div>
+      <div class="profile-narrative" id="profile-narrative"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CLOSING ===== -->
+<section class="scroll-section" id="sec-closing">
+  <div class="scroll-content" id="content-closing" style="text-align: center;">
+    <div style="font-size: 3rem; margin-bottom: 2rem;">🦉</div>
+    <h2>So. Is your music taste unique?</h2>
+    <p>The owl has shown you: the songs you love were, in most cases, shipped to your country by a very specific set of exporters. The artists you discovered were placed on your charts by the same forces that placed them on 30 other countries' charts at the same time.</p>
+    <p>This does not make the music less real. It does not make the feeling less yours.</p>
+    <p style="color: var(--text);">But the owl wants you to know: you are part of a pattern. A beautiful, measurable, nine-year pattern of how culture travels across borders without anyone signing a trade agreement.</p>
+    <p style="color: var(--gold); font-style: italic; margin-top: 2rem;">Your playlist is yours. But it was assembled from parts that came from everywhere.</p>
+    <p style="color: var(--text-muted); margin-top: 1rem;">The owl finds this comforting. She hopes you do too.</p>
+  </div>
+</section>
+
+<!-- ===== METHODOLOGY ===== -->
+<section class="scroll-section" id="sec-methodology" style="min-height: auto; padding-bottom: 2rem;">
+  <div class="scroll-content" id="content-methodology" style="max-width: 800px;">
+    <div class="methodology">
+      <h2 style="margin-bottom: 1.5rem;">References & Methodology</h2>
+
+      <h3>Data Source</h3>
+      <p><strong>Spotify Charts Daily (2017-2025)</strong><br>
+      Public dataset: <a href="https://www.kaggle.com/datasets/gonzalopezgil/spotify-charts-daily-updated" target="_blank">gonzalopezgil/spotify-charts-daily-updated</a> (Kaggle)</p>
+      <ul>
+        <li>42.8 million rows</li>
+        <li>70 countries (Israel and Belarus excluded due to data gaps)</li>
+        <li>Daily top-200 songs per country with stream counts</li>
+      </ul>
+
+      <h3>Methodology</h3>
+      <ul>
+        <li><strong>Weekly aggregation:</strong> Daily charts summed to weekly by streams, ranked top 100 per country per week. This gives us 3.16 million song-country-week records.</li>
+        <li><strong>Artist nationality:</strong> Each of the 84,985 artists mapped to 1-2 home countries using Wikipedia, Wikidata, MusicBrainz, Kaggle datasets, and language-model-assisted research. Coverage: 99.9%.</li>
+        <li><strong>Trade classification:</strong> When a song charts in the artist's home country, it is "local." When it charts anywhere else, it is an "import" for that country and an "export" for the artist's home country. Each chart-week = 1 unit of cultural influence, regardless of country size.</li>
+        <li><strong>Dual-nationality artists</strong> (e.g., born in one country, based in another) are counted as local in both home countries. Export credit is split equally.</li>
+        <li><strong>17 analytical lenses</strong> applied per country: export volume, artist/song diversity, longevity, spread, velocity, collaboration patterns, market dependency, chart position quality, freshness, artist concentration, and cultural bloc membership.</li>
+        <li><strong>Country clustering:</strong> Standardized scores across metrics to identify behavioral archetypes.</li>
+      </ul>
+
+      <h3>What "Export Weeks" Means</h3>
+      <p>Every time a song appears in the top 100 of a country that is NOT the artist's home country, that counts as 1 export week. We treat every market equally -- a chart-week in Luxembourg counts the same as a chart-week in the United States. This measures cultural reach, not commercial revenue.</p>
+
+      <h3>Tools & Technology</h3>
+      <ul>
+        <li><strong>Data pipeline:</strong> Python 3 (csv, json, collections)</li>
+        <li><strong>Visualization:</strong> D3.js v7 + Scrollama</li>
+        <li><strong>Hosting:</strong> Vercel (static deploy from GitHub)</li>
+        <li><strong>AI assistance:</strong> Claude (Anthropic) for artist nationality research, data pipeline development, and narrative drafting</li>
+      </ul>
+
+      <h3>Repository</h3>
+      <p><a href="https://github.com/Christianetti/vizcon-2026" target="_blank">github.com/Christianetti/vizcon-2026</a></p>
+
+      <h3>VizCon 2026 Compliance</h3>
+      <ul>
+        <li><strong>Theme:</strong> "How the world lives, thrives, and connects"</li>
+        <li><strong>GenAI disclosure:</strong> Claude (Anthropic) was used for artist nationality mapping, data pipeline code generation, narrative structure, and copywriting assistance</li>
+        <li><strong>Original work:</strong> All analytical methodology, insight discovery, and visualization design are original. The dataset is public.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="owl-sign">🦉</div>
+  <p>The Music Trade Economy | VizContest 2026</p>
+  <p style="margin-top: 0.5rem;">Data: Spotify Charts Daily (2017-2025) | Built with D3.js + Scrollama</p>
+  <p style="margin-top: 0.5rem;"><a href="https://github.com/Christianetti/vizcon-2026" style="color: var(--accent); text-decoration: none;">GitHub</a></p>
+</footer>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+// Country code to flag emoji
+function flagEmoji(code) {
+  if (code === 'pr') return '🇵🇷';
+  if (code === 'jm') return '🇯🇲';
+  return String.fromCodePoint(...code.toUpperCase().split('').map(c => 127397 + c.charCodeAt(0)));
+}
+
+// Anglophone country origins
+const ANGLO_CODES = ['us', 'gb', 'ca', 'au', 'nz', 'ie'];
+const LATIN_CODES = ['pr', 'co', 'mx', 'ar', 'cl', 'do', 'ec', 'pe', 'sv', 'gt', 'hn', 'ni', 'pa', 'py', 'uy', 've', 'bo', 'cr'];
+
+function isAnglo(code) { return ANGLO_CODES.includes(code); }
+function isLatin(code) { return LATIN_CODES.includes(code) || code === 'es'; }
+
+// ===== LOAD DATA =====
+let economyData, profilesData, championsData;
+
+Promise.all([
+  fetch('music_economy.json').then(r => r.json()),
+  fetch('country_profiles.json').then(r => r.json()),
+  fetch('yearly_champions.json').then(r => r.json()),
+]).then(([economy, profiles, champions]) => {
+  economyData = economy;
+  profilesData = profiles;
+  championsData = champions;
+
+  buildYearlySongsTable();
+  buildYearlyArtistsTable();
+  buildAngloCountries();
+  buildFortressChart();
+  buildCollabChart();
+  buildCountryGrid();
+  initScrollama();
+});
+
+// ===== BUILD YEARLY SONGS TABLE =====
+function buildYearlySongsTable() {
+  const tbody = document.querySelector('#yearly-songs-table tbody');
+  // Skip 2016
+  const songs = championsData.yearly_top_song.filter(s => s.year >= 2017);
+  songs.forEach(s => {
+    const isAng = isAnglo(s.origin);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${s.year}</td>
+      <td>${s.name}</td>
+      <td>${s.artist}</td>
+      <td><span class="origin-badge anglo">${s.origin.toUpperCase()}</span></td>
+      <td>${s.countries} countries</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ===== BUILD YEARLY ARTISTS TABLE =====
+function buildYearlyArtistsTable() {
+  const tbody = document.querySelector('#yearly-artists-table tbody');
+  const artists = championsData.yearly_top_artist.filter(a => a.year >= 2017);
+  artists.forEach(a => {
+    const origin = a.origin || '';
+    const isLat = isLatin(origin);
+    const tr = document.createElement('tr');
+    if (isLat) tr.classList.add('highlight');
+    tr.innerHTML = `
+      <td>${a.year}</td>
+      <td>${a.artist}</td>
+      <td><span class="origin-badge ${isLat ? 'latin' : 'anglo'}">${origin.toUpperCase()}</span></td>
+      <td>${a.foreign_weeks ? a.foreign_weeks.toLocaleString() : ''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ===== ANGLOPHONE COUNTRIES =====
+function buildAngloCountries() {
+  const container = document.getElementById('anglo-countries');
+  const names = { us: 'United States', gb: 'UK', ca: 'Canada', au: 'Australia', nz: 'New Zealand', ie: 'Ireland' };
+  ANGLO_CODES.forEach(code => {
+    const chip = document.createElement('span');
+    chip.className = 'country-chip';
+    chip.textContent = `${flagEmoji(code)} ${names[code]}`;
+    container.appendChild(chip);
+  });
+}
+
+// ===== FORTRESS CHART =====
+function buildFortressChart() {
+  const container = document.getElementById('fortress-chart');
+  const fortresses = [
+    { name: 'Brazil', pct: 84, flag: '🇧🇷' },
+    { name: 'South Korea', pct: 72, flag: '🇰🇷' },
+    { name: 'France', pct: 62, flag: '🇫🇷' },
+    { name: 'Japan', pct: 68, flag: '🇯🇵' },
+    { name: 'India', pct: 55, flag: '🇮🇳' },
+  ].sort((a, b) => b.pct - a.pct);
+
+  fortresses.forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'bar-chart-row';
+    row.innerHTML = `
+      <div class="bar-label">${f.flag} ${f.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: ${f.pct}%; background: var(--coral);">${f.pct}% local</div>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// ===== COLLAB CHART =====
+function buildCollabChart() {
+  const container = document.getElementById('collab-chart');
+  const data = [
+    { name: 'Puerto Rico', pct: 72 },
+    { name: 'Colombia', pct: 72 },
+    { name: 'Mexico', pct: 58 },
+    { name: 'United States', pct: 40 },
+    { name: 'UK', pct: 35 },
+    { name: 'South Korea', pct: 22 },
+  ];
+
+  data.forEach(d => {
+    const row = document.createElement('div');
+    row.className = 'bar-chart-row';
+    const color = d.pct > 50 ? 'var(--orange)' : d.pct > 30 ? 'var(--blue)' : 'var(--purple)';
+    row.innerHTML = `
+      <div class="bar-label">${d.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: ${d.pct}%; background: ${color};">${d.pct}%</div>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// ===== COUNTRY GRID =====
+function buildCountryGrid() {
+  const grid = document.getElementById('country-grid');
+  const search = document.getElementById('country-search');
+
+  const countries = profilesData.countries
+    .filter(c => c.has_chart)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  function render(filter = '') {
+    grid.innerHTML = '';
+    const filtered = filter
+      ? countries.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()))
+      : countries;
+    filtered.forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'country-btn';
+      btn.textContent = `${flagEmoji(c.code)} ${c.name}`;
+      btn.onclick = () => selectCountry(c.code);
+      grid.appendChild(btn);
+    });
+  }
+
+  search.addEventListener('input', e => render(e.target.value));
+  render();
+}
+
+// ===== SELECT COUNTRY =====
+function selectCountry(code) {
+  const profile = profilesData.countries.find(c => c.code === code);
+  if (!profile) return;
+
+  // Highlight button
+  document.querySelectorAll('.country-btn').forEach(b => b.classList.remove('selected'));
+  const btns = document.querySelectorAll('.country-btn');
+  btns.forEach(b => { if (b.textContent.includes(profile.name)) b.classList.add('selected'); });
+
+  const el = document.getElementById('country-profile');
+  el.classList.add('visible');
+
+  document.getElementById('profile-flag').textContent = flagEmoji(code);
+  document.getElementById('profile-name').textContent = profile.name;
+
+  // Archetype
+  let archetype = '';
+  if (profile.pct_local >= 50) archetype = 'Cultural Fortress';
+  else if (profile.pct_local < 5) archetype = 'Open Market';
+  else if (isAnglo(code)) archetype = 'Anglophone Network';
+  else if (isLatin(code) && profile.ratio >= 1) archetype = 'Latin Powerhouse';
+  else if (profile.ratio >= 1) archetype = 'Net Exporter';
+  else archetype = 'Net Importer';
+  document.getElementById('profile-archetype').textContent = archetype;
+
+  // Metrics
+  const metricsEl = document.getElementById('profile-metrics');
+  metricsEl.innerHTML = '';
+  const metrics = [
+    { value: `${profile.pct_local}%`, label: 'Local Music' },
+    { value: `${profile.pct_open}%`, label: 'Imported' },
+    { value: profile.export_weeks.toLocaleString(), label: 'Export Weeks' },
+    { value: `${profile.ratio}:1`, label: 'Export Ratio' },
+    { value: profile.destinations || '0', label: 'Destinations' },
+    { value: `${profile.longevity_p50 || 0}w`, label: 'Song Longevity (median)' },
+  ];
+  metrics.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'profile-metric';
+    div.innerHTML = `<div class="value">${m.value}</div><div class="label">${m.label}</div>`;
+    metricsEl.appendChild(div);
+  });
+
+  // Time series chart
+  buildProfileChart(code);
+
+  // Narrative
+  const narrativeEl = document.getElementById('profile-narrative');
+  narrativeEl.innerHTML = generateNarrative(profile, code);
+
+  // Scroll to profile
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ===== PROFILE CHART (TIME SERIES) =====
+function buildProfileChart(code) {
+  const container = document.getElementById('profile-chart');
+  container.innerHTML = '';
+
+  const ts = economyData.time_series[code];
+  if (!ts || ts.length === 0) {
+    container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No time series data available.</p>';
+    return;
+  }
+
+  const data = ts.filter(d => d.year >= 2017).map(d => ({
+    year: d.year,
+    local: d.reach.pct_local,
+    exports: d.reach.export_weeks
+  }));
+
+  const margin = { top: 30, right: 60, bottom: 40, left: 50 };
+  const width = 680 - margin.left - margin.right;
+  const height = 200 - margin.top - margin.bottom;
+
+  const svg = d3.select(container)
+    .append('svg')
+    .attr('viewBox', `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+    .attr('width', '100%')
+    .append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.year))
+    .range([0, width]);
+
+  const yLocal = d3.scaleLinear()
+    .domain([0, 100])
+    .range([height, 0]);
+
+  // Local % area
+  const area = d3.area()
+    .x(d => x(d.year))
+    .y0(height)
+    .y1(d => yLocal(d.local))
+    .curve(d3.curveMonotoneX);
+
+  svg.append('path')
+    .datum(data)
+    .attr('d', area)
+    .attr('fill', 'rgba(29, 185, 84, 0.2)')
+    .attr('stroke', 'var(--accent)')
+    .attr('stroke-width', 2);
+
+  // Axes
+  svg.append('g')
+    .attr('transform', `translate(0,${height})`)
+    .call(d3.axisBottom(x).ticks(data.length).tickFormat(d3.format('d')))
+    .call(g => g.select('.domain').attr('stroke', '#333'))
+    .call(g => g.selectAll('text').attr('fill', '#888').attr('font-size', '10px'))
+    .call(g => g.selectAll('line').attr('stroke', '#333'));
+
+  svg.append('g')
+    .call(d3.axisLeft(yLocal).ticks(5).tickFormat(d => d + '%'))
+    .call(g => g.select('.domain').attr('stroke', '#333'))
+    .call(g => g.selectAll('text').attr('fill', '#888').attr('font-size', '10px'))
+    .call(g => g.selectAll('line').attr('stroke', '#222'));
+
+  svg.append('text')
+    .attr('x', width / 2)
+    .attr('y', -12)
+    .attr('text-anchor', 'middle')
+    .attr('fill', '#888')
+    .attr('font-size', '11px')
+    .text('% Local Music on Charts Over Time');
+}
+
+// ===== GENERATE NARRATIVE =====
+function generateNarrative(profile, code) {
+  const name = profile.name;
+  const pctLocal = profile.pct_local;
+  const ratio = profile.ratio;
+  const exports = profile.export_weeks;
+  const dest = profile.destinations || 0;
+  const longevity = profile.longevity_p50 || 0;
+
+  let narrative = '';
+
+  if (pctLocal >= 70) {
+    narrative = `Your charts are <strong>${pctLocal}% local</strong>. You are a fortress. The world knocks on your door every year. ${name} answers politely and goes back to its own playlist. The owl approves.`;
+  } else if (pctLocal >= 40) {
+    narrative = `Your charts are <strong>${pctLocal}% local</strong>. ${name} maintains a healthy balance -- its own music holds strong, but it welcomes the global current too. A selective importer.`;
+  } else if (pctLocal >= 10) {
+    narrative = `Your charts are <strong>${pctLocal}% local</strong>. ${name} is an open market -- most of what you hear was made elsewhere. Your taste is shaped by the countries that export to you.`;
+  } else {
+    narrative = `Your charts are <strong>${pctLocal}% local</strong>. ${name} is one of the most cosmopolitan markets on Earth. Almost everything you hear traveled from somewhere else. Your playlist is the entire world.`;
+  }
+
+  if (ratio >= 10) {
+    narrative += ` With a ${ratio}:1 export ratio, ${name} is a major cultural exporter -- sending far more music out than it receives.`;
+  } else if (ratio >= 1) {
+    narrative += ` With a ${ratio}:1 ratio, ${name} holds its own -- exporting slightly more than it imports.`;
+  } else if (exports > 1000) {
+    narrative += ` ${name} does export (${exports.toLocaleString()} chart-weeks abroad), but it imports significantly more.`;
+  }
+
+  if (dest > 50) {
+    narrative += ` Its music reaches ${dest} countries -- a truly global footprint.`;
+  } else if (dest > 20) {
+    narrative += ` Its music reaches ${dest} countries -- a solid regional presence.`;
+  }
+
+  narrative += `<br><br><em>The owl has filed ${name} accordingly.</em>`;
+  return narrative;
+}
+
+// ===== SCROLLAMA =====
+function initScrollama() {
+  const scroller = scrollama();
+
+  scroller
+    .setup({
+      step: '.scroll-content',
+      offset: 0.6,
+      once: false,
+    })
+    .onStepEnter(response => {
+      response.element.classList.add('is-active');
+
+      // Trigger specific animations
+      const id = response.element.id;
+
+      if (id === 'content-imports') {
+        setTimeout(() => {
+          document.querySelector('.stat-bar-imported').style.width = '67%';
+          document.querySelector('.stat-bar-local').style.width = '33%';
+        }, 300);
+      }
+
+      if (id === 'content-song-reveal') {
+        triggerReveal(['suspense-1', 'suspense-2', 'suspense-3', 'song-reveal', 'song-stat'], 400);
+      }
+
+      if (id === 'content-artist-reveal') {
+        triggerReveal(['artist-suspense-1', 'artist-suspense-2', 'artist-suspense-3', 'artist-reveal', 'artist-stat'], 400);
+      }
+    });
+
+  // Make methodology always visible
+  document.getElementById('content-methodology').classList.add('is-active');
+  document.getElementById('content-your-country').classList.add('is-active');
+}
+
+function triggerReveal(ids, delay) {
+  ids.forEach((id, i) => {
+    setTimeout(() => {
+      document.getElementById(id).classList.add('show');
+    }, delay * (i + 1));
+  });
+}
+</script>
+
 </body>
 </html>
