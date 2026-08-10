@@ -258,29 +258,27 @@ async function renderHeroMap() {
     })
     .attr('r', d => 6 + Math.random() * 8);
 
-  // Sequential animation: one country lights up at a time
+  // Sequential animation: one country lights up at a time, 5x bigger, 10x faster
   let currentIdx = 0;
 
   function pulseNext() {
-    // Reset previous bubble
-    bubbles.attr('r', 6).attr('opacity', 0.3);
+    bubbles.attr('r', 4).attr('opacity', 0.2);
 
-    // Pulse current bubble
     const current = d3.select(bubbles.nodes()[currentIdx]);
     current
       .transition()
-      .duration(400)
+      .duration(40)
       .ease(d3.easeCubicOut)
-      .attr('r', 18)
+      .attr('r', 90)
       .attr('opacity', 0.9)
       .transition()
-      .duration(600)
+      .duration(60)
       .ease(d3.easeCubicIn)
-      .attr('r', 8)
-      .attr('opacity', 0.5);
+      .attr('r', 6)
+      .attr('opacity', 0.3);
 
     currentIdx = (currentIdx + 1) % CHART_COUNTRIES.length;
-    setTimeout(pulseNext, 1200);
+    setTimeout(pulseNext, 120);
   }
 
   pulseNext();
