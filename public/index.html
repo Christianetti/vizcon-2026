@@ -258,30 +258,33 @@ async function renderHeroMap() {
     })
     .attr('r', d => 6 + Math.random() * 8);
 
-  // Sequential animation: one country lights up at a time, 5x bigger, 10x faster
-  let currentIdx = 0;
+  // 10 random bubbles pulse simultaneously, continuously
+  const nodes = bubbles.nodes();
 
-  function pulseNext() {
-    bubbles.attr('r', 4).attr('opacity', 0.2);
+  function pulseRandom() {
+    const picks = [];
+    for (let i = 0; i < 10; i++) {
+      picks.push(nodes[Math.floor(Math.random() * nodes.length)]);
+    }
 
-    const current = d3.select(bubbles.nodes()[currentIdx]);
-    current
-      .transition()
-      .duration(40)
-      .ease(d3.easeCubicOut)
-      .attr('r', 90)
-      .attr('opacity', 0.9)
-      .transition()
-      .duration(60)
-      .ease(d3.easeCubicIn)
-      .attr('r', 6)
-      .attr('opacity', 0.3);
+    picks.forEach(node => {
+      d3.select(node)
+        .transition()
+        .duration(60)
+        .ease(d3.easeCubicOut)
+        .attr('r', 90)
+        .attr('opacity', 0.85)
+        .transition()
+        .duration(30)
+        .ease(d3.easeCubicIn)
+        .attr('r', 4)
+        .attr('opacity', 0.2);
+    });
 
-    currentIdx = (currentIdx + 1) % CHART_COUNTRIES.length;
-    setTimeout(pulseNext, 120);
+    setTimeout(pulseRandom, 100);
   }
 
-  pulseNext();
+  pulseRandom();
 }
 
 renderHeroMap();
