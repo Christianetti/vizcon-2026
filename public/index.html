@@ -270,12 +270,12 @@ async function renderHeroMap() {
     picks.forEach(node => {
       d3.select(node)
         .transition()
-        .duration(180)
+        .duration(360)
         .ease(d3.easeCubicOut)
         .attr('r', 90)
         .attr('opacity', 0.85)
         .transition()
-        .duration(90)
+        .duration(180)
         .ease(d3.easeCubicIn)
         .attr('r', 4)
         .attr('opacity', 0.2);
