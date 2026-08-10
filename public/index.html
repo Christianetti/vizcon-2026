@@ -167,17 +167,6 @@ body {
 </section>
 
 <script>
-const TOP_SONGS = [
-  { year: 2016, name: "Starboy", artist: "The Weeknd & Daft Punk", rank: 1, track_id: "5aAx2yezTd8zXrkmtKl66Z", countries: 54 },
-  { year: 2017, name: "Shape of You", artist: "Ed Sheeran", rank: 1, track_id: "7qiZfU4dY1lWllzX7mPBI3", countries: 55 },
-  { year: 2019, name: "bad guy", artist: "Billie Eilish", rank: 1, track_id: "2Fxmhks0bxGSBdJ92vM42m", countries: 63 },
-  { year: 2020, name: "Dance Monkey", artist: "Tones And I", rank: 1, track_id: "1rgnBhdG2JDFTbYkYRZAku", countries: 64 },
-  { year: 2021, name: "Blinding Lights", artist: "The Weeknd", rank: 1, track_id: "0VjIjW4GlUZAMYd2vXMi3b", countries: 63 },
-  { year: 2022, name: "Heat Waves", artist: "Glass Animals", rank: 1, track_id: "02MWAaffLxlfxAUY7c5dvx", countries: 55 },
-  { year: 2023, name: "As It Was", artist: "Harry Styles", rank: 1, track_id: "4Dvkj6JhhA12EX05fT7y2e", countries: 64 },
-  { year: 2024, name: "BIRDS OF A FEATHER", artist: "Billie Eilish", rank: 1, track_id: "6dOtVTDdiauQNBQEDOtlAB", countries: 65 },
-];
-
 const CHART_COUNTRIES = [
   "AE","AR","AT","AU","BE","BG","BO","BR","CA","CH","CL","CO","CR","CZ","DE",
   "DK","DO","EC","EE","EG","ES","FI","FR","GB","GR","GT","HK","HN","HU","ID",
@@ -186,12 +175,17 @@ const CHART_COUNTRIES = [
   "SV","TH","TR","TW","UA","US","UY","VE","VN","ZA"
 ];
 
-// Pick a random song for the hero player
-const song = TOP_SONGS[Math.floor(Math.random() * TOP_SONGS.length)];
-document.getElementById('hero-spotify').src =
-  `https://open.spotify.com/embed/track/${song.track_id}?utm_source=generator&theme=0`;
-document.getElementById('hero-song-info').textContent =
-  `${song.name}, ${song.artist} - #${song.rank} Top Ranking from 2017-2026`;
+// Load a random song between rank 23-93 from data
+fetch('country_profiles.json')
+  .then(r => r.json())
+  .then(data => {
+    const eligible = data.top100_songs.filter(s => s.rank >= 23 && s.rank <= 93);
+    const song = eligible[Math.floor(Math.random() * eligible.length)];
+    document.getElementById('hero-spotify').src =
+      `https://open.spotify.com/embed/track/${song.track_id}?utm_source=generator&theme=0`;
+    document.getElementById('hero-song-info').textContent =
+      `${song.name}, ${song.artist} - #${song.rank} Top Ranking from 2017-2026`;
+  });
 
 // World map with floating bubbles
 async function renderHeroMap() {
