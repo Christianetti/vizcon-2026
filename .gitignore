@@ -1,0 +1,9 @@
+.DS_Store
+data/
+*.csv
+*.zip
+*.xlsx
+v1.html
+v2.html
+v3.html
+concentration.html
