@@ -1,9 +1,24 @@
 .DS_Store
-data/
-*.csv
-*.zip
-*.xlsx
-v1.html
-v2.html
-v3.html
-concentration.html
+
+# Large raw data files (too big for GitHub)
+data/charts_songs_daily.csv
+data/data.csv
+data/artists.csv
+data/tracks.csv
+data/songs.csv
+data/universal_top_spotify_songs.csv
+data/*.zip
+
+# Intermediate pipeline files
+data/artists_for_llm_classification.json
+data/artists_need_wikidata.json
+data/artist_nationalities_llm.json
+data/artist_nationalities_merged.json
+data/artist_nationalities_merged_detailed.json
+data/artist_nationalities_musicbrainz.json
+data/artist_nationalities_wikidata.json
+data/artist_nationalities_wikipedia.json
+data/artist_nationalities_dual.json
+
+# Excel workbooks
+data/*.xlsx
