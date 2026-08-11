@@ -75,6 +75,7 @@ p strong{color:var(--text);font-weight:500}
 .ax text{fill:var(--muted);font-size:11px;font-family:var(--sans)}
 .gridln{stroke:var(--line);stroke-dasharray:2 4}
 .tip{position:fixed;pointer-events:none;background:#181818;border:1px solid #333;border-radius:9px;padding:10px 13px;font-size:.85rem;color:var(--text);opacity:0;transition:opacity .14s;z-index:999;max-width:260px;line-height:1.5}
+.tip.pinned{pointer-events:auto}
 .tip em{font-style:normal;color:var(--muted);font-size:.8rem}
 
 .fade{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
@@ -348,10 +349,11 @@ const DATA={"songs":[{"id":"0VjIjW4GlUZAMYd2vXMi3b","n":"Blinding Lights","a":"T
 const GC=['#a0a0a0','#6C5CE7','#00D4B4','#FF8A5B'];
 const GN=['United States','Veteran exporters','Growing powers','Regional trendsetters'];
 const tip=document.getElementById('tip');
-const show=(e,h)=>{tip.innerHTML=h;tip.style.opacity=1;
+const show=(e,h,pin)=>{tip.innerHTML=h;tip.style.opacity=1;
   tip.style.left=Math.min(e.clientX+14,innerWidth-tip.offsetWidth-12)+'px';
-  tip.style.top=Math.max(8,e.clientY-12)+'px';};
-const hide=()=>tip.style.opacity=0;
+  tip.style.top=Math.max(8,e.clientY-12)+'px';
+  if(pin)tip.classList.add('pinned');else tip.classList.remove('pinned');};
+const hide=()=>{tip.style.opacity=0;tip.classList.remove('pinned');};
 
 const CC={ae:[54,24],ar:[-64,-34],at:[14,47],au:[134,-25],be:[4,51],bg:[25,43],bo:[-65,-17],br:[-52,-10],
 ca:[-106,56],ch:[8,47],cl:[-71,-30],co:[-72,4],cr:[-84,10],cz:[15,50],de:[10,51],dk:[10,56],do:[-70,19],
@@ -450,7 +452,7 @@ function scatter(){
     g.append('text').attr('x',x(d.w)+dx).attr('y',y(d.s)+dy).attr('fill','#bdbdbd').attr('font-size',10.5)
       .attr('text-anchor',dx<0?'end':'start').text(n);
   });
-  document.getElementById('pr-btn').onclick=e=>show(e,'<b>Puerto Rico</b><br><em>The third-largest music exporter here — 246,313 chart-weeks into 68 markets. But it has no Spotify chart of its own, so no imports are recorded and its trade balance cannot be measured. It appears throughout on exports alone.</em>');
+  document.getElementById('pr-btn').onclick=e=>{e.stopPropagation();show(e,'<b>Puerto Rico</b><br><em>The third-largest music exporter here — 246,313 chart-weeks into 68 markets. But it has no Spotify chart of its own, so no imports are recorded and its trade balance cannot be measured. It appears throughout on exports alone.</em>',true);};
 }
 
 function orbit(){
